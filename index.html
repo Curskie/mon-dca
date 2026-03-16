@@ -3,215 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V3.17 - Luxury Edition</title>
+    <title>Invest Pilot V3.18 - Ultimate Gold</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        :root { 
-            --gold: #D4AF37; 
-            --gold-dim: rgba(212, 175, 55, 0.6);
-            --deep-emerald: #166534;
-            --slate-luxury: #010309; 
-        }
+        :root { --gold: #D4AF37; --bg: #010409; }
+        body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; }
         
-        body { 
-            background: var(--slate-luxury); 
-            color: #f1f5f9; 
-            font-family: 'Inter', ui-sans-serif, system-ui; 
-            margin: 0; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
-        /* TYPOGRAPHIE HAUT DE GAMME */
-        .lux-title { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 800; color: var(--gold); }
-        .data-val { font-family: 'Inter', sans-serif; font-weight: 900; tracking-tighter; }
-        .label-premium { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; font-weight: 700; }
-
-        .page { display: none; min-height: 100vh; padding: 20px; padding-bottom: 140px; }
-        .active { display: block; animation: luxFadeIn 0.5s ease-out; }
-        @keyframes luxFadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
-        
-        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #030610; z-index: 3000; transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); padding: 60px 20px; border-right: 1px solid rgba(212,175,55,0.05); overflow-y: auto; }
-        #sidebar.open { left: 0; box-shadow: 20px 0 60px rgba(0,0,0,0.8); }
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; backdrop-filter: blur(5px); }
-        
-        /* EFFET VERRE DÉPOLI LUXE */
+        /* FORÇAGE DU RENDU LUXE */
         .glass-card { 
-            background: rgba(10, 15, 30, 0.4); 
-            backdrop-filter: blur(15px); 
-            border-radius: 20px; 
-            border: 1px solid rgba(212, 175, 55, 0.08); 
-            padding: 24px; 
-            margin-bottom: 20px; 
-            transition: 0.3s;
+            background: linear-gradient(135deg, rgba(20,25,35,0.8) 0%, rgba(5,10,20,0.9) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        
-        .nav-btn { font-size: 10px; font-weight: 700; color: #64748b; padding: 16px 0; border-bottom: 1px solid transparent; flex: 1; text-align: center; text-transform: uppercase; letter-spacing: 0.1em; transition: 0.4s; }
-        .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
-        
-        .legend-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 6px; }
-        .market-trend { font-size: 10px; padding: 4px 10px; border-radius: 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        .trend-up { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
-        .trend-down { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
 
-        /* BOUTON LUXE */
-        .btn-premium { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; transition: 0.3s; color: var(--gold); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
-        .btn-premium:active { transform: scale(0.98); background: linear-gradient(135deg, #0f172a 0%, #020617 100%); }
-        .ghost-mode .blur-val { filter: blur(15px); pointer-events: none; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #484f58; flex: 1; text-align: center; padding: 15px 0; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
+
+        /* CORRECTIF STATS : FORÇAGE DES LÉGENDES VISIBLES */
+        .stat-label { font-size: 11px; font-weight: 900; color: #8b949e; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 3px; }
+
+        .page { display: none; padding: 20px; padding-bottom: 120px; }
+        .active { display: block; }
+        
+        input { background: transparent; border: none; outline: none; color: white; }
+        .gold-text { color: var(--gold); font-weight: 900; }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div id="overlay" onclick="toggleSidebar()"></div>
-    
-    <div id="sidebar">
-        <h2 class="lux-title text-sm text-center mb-8">Prestige Terminal</h2>
-
-        <div class="mb-10 p-5 glass-card border-gold/15 text-center">
-            <p class="label-premium italic mb-2">Échéance d'Or</p>
-            <p id="countdown" class="data-val text-3xl text-gold">--j --h --m</p>
-        </div>
-
-        <div class="space-y-6">
-            <div class="p-5 glass-card text-center">
-                <p class="label-premium italic mb-1">Discipline</p>
-                <p class="data-val text-4xl text-f1f5f9"><span id="streak-count">0</span> <small class="text-xs opacity-50 uppercase">Mois</small></p>
-            </div>
-            
-            <p class="label-premium ml-2">Sources d'Honneur</p>
-            <div class="grid grid-cols-2 gap-2">
-                <a href="https://www.boursorama.com" target="_blank" class="block glass-card p-4 rounded-xl text-[9px] font-bold text-center uppercase tracking-tighter">Boursorama</a>
-                <a href="https://www.zonebourse.com" target="_blank" class="block glass-card p-4 rounded-xl text-[9px] font-bold text-center uppercase tracking-tighter">Zone Bourse</a>
-            </div>
-
-            <button onclick="exportData()" class="w-full p-4 btn-premium">📄 Partager le Registre</button>
-            <button onclick="localStorage.clear(); location.reload();" class="w-full p-2 text-[8px] font-black uppercase text-red-900/40 tracking-[0.3em]">Réinitialisation</button>
-        </div>
-    </div>
-
-    <div id="lock-screen" class="fixed inset-0 bg-[#010309] z-[5000] flex flex-col items-center justify-center p-6">
-        <img src="1773669549907.png" class="w-16 h-16 rounded-3xl mb-12 border border-gold/10 shadow-2xl p-1">
-        <input type="password" id="pinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric" class="bg-transparent text-center data-val text-5xl w-32 border-b-2 border-gold outline-none caret-transparent text-gold" placeholder="••••">
+    <div id="lock-screen" class="fixed inset-0 bg-[#010409] z-[5000] flex flex-col items-center justify-center">
+        <img src="1773669549907.png" class="w-20 h-20 rounded-3xl mb-10 border border-gold/20 shadow-2xl">
+        <input type="password" id="pinInput" maxlength="4" placeholder="PIN" class="text-center text-4xl w-40 border-b-2 border-gold pb-2">
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="sticky top-0 z-[1000] flex justify-between items-center px-6 pt-14 pb-4 bg-[#010309]/80 backdrop-blur-xl border-b border-white/5">
-            <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gold">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg>
-            </button>
-            <div class="flex items-center gap-4">
-                <button onclick="toggleGhost()" class="w-10 h-10 flex items-center justify-center glass-card p-0 border border-gold/15 rounded-xl">👁️</button>
-                <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-white/10 shadow-xl">
+        <header class="p-6 pt-12 flex justify-between items-center border-b border-white/5 bg-[#010409]/90 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex flex-col">
+                <span class="text-[10px] font-black text-gold uppercase tracking-[3px]">Pilot Terminal</span>
+                <span id="current-date" class="text-[12px] opacity-50 font-bold uppercase"></span>
             </div>
+            <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-gold/30">
         </header>
 
-        <nav class="sticky top-[104px] z-[1000] flex justify-around bg-[#010309]/95 border-b border-white/5 px-2">
+        <nav class="flex border-b border-white/5 sticky top-[97px] bg-[#010409] z-50">
             <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
-            <button onclick="showPage('freedom', this)" class="nav-btn">FIRE</button>
-            <button onclick="showPage('history', this)" class="nav-btn">Stats</button>
-            <button onclick="showPage('market', this)" class="nav-btn italic text-gold">Marché</button>
+            <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
+            <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
+            <button onclick="showPage('market', this)" class="nav-btn">MARCHÉ</button>
         </nav>
 
         <div id="main" class="page active">
-            <div class="glass-card bg-gradient-to-br from-gold/5 to-transparent border-gold/10">
-                <p class="label-premium text-gold italic mb-5" id="current-date"></p>
-                <div class="flex gap-4 mb-10 items-end">
-                    <div class="flex-1">
-                        <p class="label-premium mb-1 ml-1">Versement Royal</p>
-                        <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="w-full bg-transparent data-val text-7xl outline-none tracking-tighter text-f1f5f9">
-                    </div>
-                    <button onclick="saveToHistory()" class="bg-deep-emerald w-16 h-16 rounded-2xl flex items-center justify-center active:scale-95 shadow-lg shadow-emerald-900/30 border border-emerald-500/20">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </button>
+            <div class="glass-card">
+                <p class="text-[10px] font-black text-gold/60 uppercase mb-2 tracking-widest italic">Versement Mensuel</p>
+                <div class="flex items-end gap-4 mb-8">
+                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black w-full tracking-tighter">
+                    <button onclick="saveToHistory()" class="bg-gold text-black w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl mb-1">✓</button>
                 </div>
                 <div id="calculation-list" class="space-y-3"></div>
             </div>
         </div>
 
-        <div id="freedom" class="page">
-            <div class="glass-card text-center py-10 relative">
-                <p class="label-premium mb-2">Rente d'Honneur / Objectif (1500€)</p>
-                <div class="data-val text-7xl mb-12 text-f1f5f9" id="rente-val">0 €</div>
-                <div class="space-y-6 text-left px-2">
-                    <div id="step-1" class="flex justify-between items-center label-premium text-slate-500"><span>☕ Services essentiels</span><span id="rem-50" class="data-val text-f1f5f9">50€</span></div>
-                    <div id="step-2" class="flex justify-between items-center label-premium text-slate-500"><span>🛒 Art de Vivre</span><span id="rem-250" class="data-val text-f1f5f9">250€</span></div>
-                    <div id="step-3" class="flex justify-between items-center label-premium text-slate-500"><span>🏠 Domaine Principal</span><span id="rem-800" class="data-val text-f1f5f9">800€</span></div>
-                    <div class="h-1.5 bg-slate-950 rounded-full mt-4 overflow-hidden border border-white/5">
-                        <div id="freedom-progress" class="h-full bg-gradient-to-r from-gold to-emerald-400 transition-all duration-1000 w-0"></div>
-                    </div>
+        <div id="fire" class="page">
+            <div class="glass-card text-center py-10">
+                <p class="text-[10px] font-black text-gold/60 uppercase mb-4 tracking-[0.2em]">Rente Mensuelle (Objectif 1500€)</p>
+                <div class="text-7xl font-black text-white mb-10" id="rente-val">0 €</div>
+                <div class="space-y-6 text-left">
+                    <div id="step-1" class="flex justify-between items-center stat-label"><span>☕ Abonnements (50€)</span><span id="rem-50" class="text-gold">50€</span></div>
+                    <div id="step-2" class="flex justify-between items-center stat-label"><span>🛒 Courses (250€)</span><span id="rem-250" class="text-gold">250€</span></div>
+                    <div id="step-3" class="flex justify-between items-center stat-label"><span>🏠 Loyer (800€)</span><span id="rem-800" class="text-gold">800€</span></div>
+                    <div class="h-1 bg-white/5 rounded-full mt-4"><div id="fire-progress" class="h-full bg-gold transition-all duration-1000 w-0"></div></div>
                 </div>
             </div>
         </div>
 
-        <div id="history" class="page">
+        <div id="stats" class="page">
             <div class="glass-card">
-                <p class="label-premium mb-6 text-center italic text-slate-400">Patrimoine d'Actifs</p>
-                <div class="h-48 mb-8"><canvas id="allocationChart"></canvas></div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-gold"></span>PEA: 85%</div>
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-emerald-500"></span>CRYPTO: 11%</div>
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-orange-500"></span>CTO: 4%</div>
+                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest italic">Allocation d'Actifs</p>
+                <div class="h-48 mb-8"><canvas id="allocChart"></canvas></div>
+                <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
+                    <div class="stat-label"><div class="dot bg-[#D4AF37]"></div>PEA</div>
+                    <div class="stat-label"><div class="dot bg-[#10b981]"></div>CRYPTO</div>
+                    <div class="stat-label"><div class="dot bg-[#f59e0b]"></div>CTO</div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mt-2">
+                    <div class="text-center text-[12px] font-bold">85%</div>
+                    <div class="text-center text-[12px] font-bold">11%</div>
+                    <div class="text-center text-[12px] font-bold">4%</div>
                 </div>
             </div>
 
             <div class="glass-card">
-                <p class="label-premium mb-6 text-center italic text-slate-400">Sphère Géographique</p>
+                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest italic">Exposition Géographique</p>
                 <div class="h-48 mb-8"><canvas id="geoChart"></canvas></div>
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-red-600"></span>USA: 70%</div>
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-gold"></span>EUROPE: 20%</div>
-                    <div class="text-[9px] font-bold text-center uppercase text-slate-300"><span class="legend-dot bg-indigo-500"></span>EM: 10%</div>
+                <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
+                    <div class="stat-label"><div class="dot bg-[#ef4444]"></div>USA</div>
+                    <div class="stat-label"><div class="dot bg-[#D4AF37]"></div>EUROPE</div>
+                    <div class="stat-label"><div class="dot bg-[#6366f1]"></div>EM</div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mt-2">
+                    <div class="text-center text-[12px] font-bold">70%</div>
+                    <div class="text-center text-[12px] font-bold">20%</div>
+                    <div class="text-center text-[12px] font-bold">10%</div>
                 </div>
             </div>
-            
-            <div id="history-list" class="space-y-2 mt-6"></div>
         </div>
 
         <div id="market" class="page">
-            <div class="h-[600px] glass-card p-1 rounded-3xl overflow-hidden">
+            <div class="glass-card h-[500px] p-0 overflow-hidden border-gold/30">
                 <iframe src="https://s.tradingview.com/embed-widget/market-overview/?locale=fr#%7B%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22tabs%22%3A%5B%7B%22title%22%3A%22Indices%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22FOREXCOM%3ASPX500%22%2C%22d%22%3A%22S%26P%20500%22%7D%2C%7B%22s%22%3A%22INDEX%3ACAC40%22%2C%22d%22%3A%22CAC%2040%22%7D%2C%7B%22s%22%3A%22BINANCE%3ABTCUSDT%22%2C%22d%22%3A%22Bitcoin%22%7D%5D%7D%5D%7D" width="100%" height="100%" frameborder="0"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        const PIN_CODE = "1104";
         const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
         let charts = {};
 
         function initApp() {
             document.getElementById('pinInput').addEventListener('input', (e) => {
-                if(e.target.value === PIN_CODE) {
+                if(e.target.value === "1104") {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
                     updateAll();
-                    startCountdown();
                 }
             });
             calculateDCA();
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-        }
-
-        function startCountdown() {
-            function update() {
-                const now = new Date();
-                const nextDCA = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-                const diff = nextDCA - now;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                const mins = Math.floor((diff / 1000 / 60) % 60);
-                document.getElementById('countdown').innerText = `${days}j ${hours}h ${mins}m`;
-            }
-            update(); setInterval(update, 60000);
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            const overlay = document.getElementById('overlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
         }
 
         function calculateDCA() {
@@ -221,9 +146,9 @@
             if (val > 330) { const s = val - 330; res.world += s * 0.8; res.crypto += s * 0.2; }
             else { const r = val / 330; Object.keys(baseData).forEach(k => res[k] *= r); }
             container.innerHTML = Object.keys(res).map(k => `
-                <div class="flex justify-between items-center p-4 glass-card p-5 mb-0 mb-3 border border-white/5 rounded-2xl">
-                    <span class="label-premium tracking-wider text-slate-400">${k}</span>
-                    <span class="data-val text-2xl text-f1f5f9">${res[k].toFixed(2)}€</span>
+                <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
+                    <span class="text-[10px] font-black text-gold uppercase opacity-60">${k}</span>
+                    <span class="text-xl font-black">${res[k].toFixed(2)}€</span>
                 </div>`).join('');
         }
 
@@ -233,41 +158,30 @@
             const rente = (total * 0.04) / 12;
             document.getElementById('rente-val').innerText = rente.toFixed(2) + " €";
             
-            updateStep(1, rente, 50, 'rem-50');
-            updateStep(2, rente, 250, 'rem-250');
-            updateStep(3, rente, 800, 'rem-800');
-            
-            document.getElementById('freedom-progress').style.width = Math.min((rente / 1500) * 100, 100) + "%";
-            document.getElementById('streak-count').innerText = history.length;
+            const steps = [50, 250, 800];
+            steps.forEach((s, i) => {
+                const el = document.getElementById('step-' + (i+1));
+                const rem = document.getElementById('rem-' + s);
+                if(rente >= s) { el.style.opacity = "1"; el.style.color = "#10b981"; rem.innerText = "OK"; }
+                else { el.style.opacity = "0.4"; rem.innerText = (s - rente).toFixed(0) + "€"; }
+            });
+
+            document.getElementById('fire-progress').style.width = Math.min((rente/1500)*100, 100) + "%";
             renderCharts();
-
-            document.getElementById('history-list').innerHTML = history.slice().reverse().map(item => `
-                <div class="flex justify-between p-6 glass-card p-5 border-white/5 mb-3 rounded-2xl">
-                    <span class="label-premium italic text-slate-500">${item.date}</span>
-                    <span class="data-val text-xl text-gold">+${item.amount.toFixed(0)}€</span>
-                </div>`).join('');
-        }
-
-        function updateStep(num, current, target, elId) {
-            const el = document.getElementById('step-' + num);
-            const remEl = document.getElementById(elId);
-            if(current >= target) { el.style.color = "#10b981"; remEl.innerText = "DONE"; }
-            else { el.style.color = "#475569"; remEl.innerText = (target - current).toFixed(0) + "€"; }
         }
 
         function renderCharts() {
             const cfgs = [
-                { id: 'allocationChart', data: [85, 11, 4], colors: ['#D4AF37', '#10b981', '#f59e0b'] }, // Gold PEA
-                { id: 'geoChart', data: [70, 20, 10], colors: ['#b91c1c', '#D4AF37', '#6366f1'] }    // Gold Europe
+                { id: 'allocChart', data: [85, 11, 4], colors: ['#D4AF37', '#10b981', '#f59e0b'] },
+                { id: 'geoChart', data: [70, 20, 10], colors: ['#ef4444', '#D4AF37', '#6366f1'] }
             ];
             cfgs.forEach(cfg => {
                 const ctx = document.getElementById(cfg.id);
-                if(!ctx) return;
                 if(charts[cfg.id]) charts[cfg.id].destroy();
                 charts[cfg.id] = new Chart(ctx, {
                     type: 'doughnut',
-                    data: { datasets: [{ data: cfg.data, backgroundColor: cfg.colors, borderWidth: 0, hoverOffset: 10 }] },
-                    options: { cutout: '82%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    data: { datasets: [{ data: cfg.data, backgroundColor: cfg.colors, borderWidth: 0 }] },
+                    options: { cutout: '85%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
             });
         }
@@ -276,9 +190,10 @@
             const val = parseFloat(document.getElementById('dcaInput').value);
             if(!val) return;
             const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
-            history.push({ date: new Date().toLocaleDateString('fr-FR', { month: 'short', year: '2y' }), amount: val });
+            history.push({ date: new Date().toLocaleDateString('fr-FR', { month: 'short' }), amount: val });
             localStorage.setItem('invest_history', JSON.stringify(history));
             updateAll();
+            alert("Versement enregistré !");
         }
 
         function showPage(id, btn) {
@@ -286,12 +201,8 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
-            if(id === 'history') setTimeout(renderCharts, 150);
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            if(id === 'stats') setTimeout(renderCharts, 100);
         }
-
-        function toggleGhost() { document.body.classList.toggle('ghost-mode'); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Registre copié !"); }
     </script>
 </body>
 </html>
