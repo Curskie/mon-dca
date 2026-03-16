@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V4.3 - Full Edition</title>
+    <title>Invest Pilot V4.3</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Invest Pilot">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#010409">
+    <link rel="apple-touch-icon" href="1773669549907.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,7 +19,14 @@
     
     <style>
         :root { --gold: #D4AF37; --bg: #010409; }
-        body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+        body { 
+            background: var(--bg); 
+            color: #e6edf3; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding-top: env(safe-area-inset-top); 
+            overflow-x: hidden; 
+        }
         
         .glass-card { 
             background: linear-gradient(135deg, rgba(20,25,35,0.8) 0%, rgba(5,10,20,0.9) 100%);
@@ -20,7 +34,7 @@
             border-radius: 24px; padding: 24px; margin-bottom: 20px;
         }
 
-        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #05070a; z-index: 3000; transition: 0.4s; padding: 40px 20px; border-right: 1px solid rgba(212,175,55,0.1); overflow-y: auto; }
+        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #05070a; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(212,175,55,0.1); overflow-y: auto; }
         #sidebar.open { left: 0; }
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2500; display: none; backdrop-filter: blur(8px); }
 
@@ -33,7 +47,6 @@
         .stat-label { font-size: 9px; font-weight: 900; color: #8b949e; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .dot { width: 7px; height: 7px; border-radius: 2px; }
 
-        /* Grades System */
         .grade-card { opacity: 0.2; filter: grayscale(1); transition: 0.3s; text-align: center; }
         .grade-active { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
     </style>
@@ -66,7 +79,7 @@
     <div id="app-content" style="display:none">
         <header class="p-6 pt-12 flex justify-between items-center border-b border-white/5 bg-[#010409]/90 sticky top-0 z-50">
             <button onclick="toggleSidebar()" class="text-gold p-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg></button>
-            <span id="current-date" class="text-[11px] font-black text-gold uppercase tracking-widest text-center">Mars 2026</span>
+            <span id="current-date" class="text-[11px] font-black text-gold uppercase tracking-widest text-center">Invest Pilot</span>
             <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-gold/30">
         </header>
 
@@ -98,8 +111,8 @@
 
         <div id="fire" class="page">
             <div class="glass-card text-center">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Liberté Financière</p>
-                <div class="text-6xl font-black text-white mb-10" id="rente-val">0 €</div>
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Projection Patrimoine</p>
+                <div class="text-5xl font-black text-white mb-10" id="rente-val">0 €</div>
                 <div id="forecast-list" class="space-y-4 text-left border-t border-white/5 pt-6"></div>
             </div>
         </div>
@@ -131,7 +144,7 @@
     </div>
 
     <script>
-        const PIN_SECRET = "1104";
+        const PIN_SECRET = "1104"; // MODIFIE TON CODE ICI
         const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
         let charts = {};
 
@@ -176,7 +189,6 @@
             document.getElementById('rente-val').innerText = rente.toFixed(2) + " €";
             document.getElementById('streak-val').innerText = streak;
 
-            // Update Grades
             document.querySelectorAll('.grade-card').forEach(c => c.classList.remove('grade-active'));
             if(streak >= 1) document.getElementById('g-1').classList.add('grade-active');
             if(streak >= 3) document.getElementById('g-3').classList.add('grade-active');
@@ -191,7 +203,6 @@
                     <p class="text-xl font-black">${cap.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0})}</p>
                 </div>`;
             }).join('');
-
             renderCharts();
         }
 
@@ -215,7 +226,7 @@
             history.push({ amount: val });
             localStorage.setItem('invest_history', JSON.stringify(history));
             updateAll();
-            alert("Stratégie validée !");
+            alert("Injection enregistrée !");
         }
 
         function showPage(id, btn) {
@@ -235,7 +246,7 @@
         }
 
         function saveVault() { localStorage.setItem('invest_vault', document.getElementById('vault-input').value); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Data copiée !"); }
+        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Copié !"); }
         function hardReset() { if(confirm("Voulez-vous tout réinitialiser ?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
