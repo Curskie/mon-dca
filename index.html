@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.1.7 - Elite Strategic</title>
+    <title>Invest Pilot V5.1.8 - Terminal</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,6 +47,10 @@
         .progress-bar { height: 100%; background: linear-gradient(90deg, #8a6d3b, var(--gold)); width: 0%; transition: 1.5s ease-in-out; }
         
         .stat-dot { width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px; }
+
+        /* Style des boutons Market */
+        .market-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.1); padding: 10px 5px; rounded: 12px; font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; transition: 0.3s; }
+        .market-btn-active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.05); }
     </style>
 </head>
 <body onload="initApp()">
@@ -74,7 +78,7 @@
             <button onclick="toggleSidebar()" class="text-gold p-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg></button>
             <div class="text-center">
                 <p id="alert-msg" class="text-[8px] font-black text-gold animate-pulse mb-1 hidden uppercase tracking-widest">Alerte : DCA Insuffisant</p>
-                <span class="text-[11px] font-black text-white uppercase tracking-widest italic">Elite Wealth V5.1.7</span>
+                <span class="text-[11px] font-black text-white uppercase tracking-widest italic">Elite Wealth V5.1.8</span>
             </div>
             <img src="1773692905742.png" class="w-10 h-10 rounded-xl border border-gold/30">
         </header>
@@ -95,7 +99,6 @@
                     <div id="g-6" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">ARGENT</p></div>
                 </div>
             </div>
-
             <div class="glass-card">
                 <div class="flex items-end gap-4 mb-8">
                     <div class="w-full">
@@ -110,7 +113,7 @@
 
         <div id="fire" class="page">
             <div class="glass-card text-center relative">
-                <button onclick="setNewGoal()" class="absolute right-4 top-4 text-slate-600 hover:text-gold transition-colors">
+                <button onclick="setNewGoal()" class="absolute right-4 top-4 text-slate-600 hover:text-gold">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
                 </button>
                 <p class="text-[10px] font-black text-gold uppercase mb-6 tracking-[2px]">Liberté Financière</p>
@@ -123,7 +126,7 @@
                     <p class="text-[8px] text-slate-500 font-bold uppercase mt-1 italic">Cible : <span id="goal-label">500</span> € / mois</p>
                 </div>
                 <div class="text-5xl font-black text-white mb-2" id="rente-val">0 €</div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase mb-10 tracking-widest italic">Rente mensuelle passive (4%)</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase mb-10 tracking-widest italic">Rente mensuelle passive</p>
                 <div id="forecast-list" class="space-y-4 text-left border-t border-white/5 pt-6"></div>
             </div>
         </div>
@@ -135,52 +138,46 @@
                 <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
                     <div>
                         <div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">PEA</span>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">PEA</span>
                         <span class="text-[11px] font-black text-white">85%</span>
                     </div>
                     <div>
                         <div class="stat-dot bg-[#10b981] shadow-[0_0_8px_#10b981] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">CRYPTO</span>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">CRYPTO</span>
                         <span class="text-[11px] font-black text-white">11%</span>
                     </div>
                     <div>
                         <div class="stat-dot bg-[#f59e0b] shadow-[0_0_8px_#f59e0b] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">CTO</span>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">CTO</span>
                         <span class="text-[11px] font-black text-white">4%</span>
                     </div>
                 </div>
             </div>
-
             <div class="glass-card">
                 <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest">Zones Géo</p>
                 <div class="h-48 mb-8"><canvas id="geoChart"></canvas></div>
                 <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
-                    <div>
-                        <div class="stat-dot bg-[#ef4444] shadow-[0_0_8px_#ef4444] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">USA</span>
-                        <span class="text-[11px] font-black text-white">70%</span>
-                    </div>
-                    <div>
-                        <div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">EURO</span>
-                        <span class="text-[11px] font-black text-white">20%</span>
-                    </div>
-                    <div>
-                        <div class="stat-dot bg-[#6366f1] shadow-[0_0_8px_#6366f1] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">EM</span>
-                        <span class="text-[11px] font-black text-white">10%</span>
-                    </div>
+                    <div><div class="stat-dot bg-[#ef4444] shadow-[0_0_8px_#ef4444] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">USA</span><span class="text-[11px] font-black text-white">70%</span></div>
+                    <div><div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">EURO</span><span class="text-[11px] font-black text-white">20%</span></div>
+                    <div><div class="stat-dot bg-[#6366f1] shadow-[0_0_8px_#6366f1] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">EM</span><span class="text-[11px] font-black text-white">10%</span></div>
                 </div>
             </div>
         </div>
 
         <div id="market" class="page">
-            <div class="grid grid-cols-3 gap-2 mb-6 text-center">
-                <button onclick="loadSymbol('EURONEXT:CW8')" class="bg-white/5 p-3 rounded-xl border border-white/5 text-[8px] font-black uppercase text-gold">CW8</button>
-                <button onclick="loadSymbol('BINANCE:BTCUSDT')" class="bg-white/5 p-3 rounded-xl border border-white/5 text-[8px] font-black uppercase text-gold">BTC</button>
-                <button onclick="loadSymbol('EURONEXT:ESE')" class="bg-white/5 p-3 rounded-xl border border-white/5 text-[8px] font-black uppercase text-gold">S&P 500</button>
+            <p class="text-[10px] font-black text-gold uppercase mb-4 tracking-widest text-center">Flux Temps Réel Stratégie</p>
+            <div class="grid grid-cols-4 gap-1 mb-4 overflow-x-auto">
+                <button onclick="loadSymbol('EURONEXT:WPEA', this)" class="market-btn market-btn-active">WPEA</button>
+                <button onclick="loadSymbol('EURONEXT:ESE', this)" class="market-btn">ESE</button>
+                <button onclick="loadSymbol('EURONEXT:PAEEM', this)" class="market-btn">PAEEM</button>
+                <button onclick="loadSymbol('EURONEXT:PMEH', this)" class="market-btn">PMEH</button>
+                <button onclick="loadSymbol('EURONEXT:COFA', this)" class="market-btn">COFA</button>
+                <button onclick="loadSymbol('EURONEXT:ASAM', this)" class="market-btn">ASAM</button>
+                <button onclick="loadSymbol('BINANCE:BTCUSDT', this)" class="market-btn">BTC</button>
+                <button onclick="loadSymbol('BINANCE:ETHUSDT', this)" class="market-btn">ETH</button>
             </div>
-            <div id="tv_container" class="glass-card h-[500px] p-0 overflow-hidden border-gold/20"></div>
+            <div id="tv_container" class="glass-card h-[450px] p-0 overflow-hidden border-gold/20"></div>
+            <p class="text-center text-[7px] text-slate-600 font-bold uppercase mt-4 tracking-widest">Données fournies par TradingView</p>
         </div>
     </div>
 
@@ -220,7 +217,7 @@
         }
 
         function setNewGoal() {
-            const newGoal = prompt("Définir ta cible de rente mensuelle (€) :", currentGoalRente);
+            const newGoal = prompt("Nouvelle cible rente mensuelle (€) :", currentGoalRente);
             if(newGoal && !isNaN(newGoal)) {
                 currentGoalRente = parseInt(newGoal);
                 localStorage.setItem('invest_goal', currentGoalRente);
@@ -232,31 +229,24 @@
             const val = parseFloat(document.getElementById('dcaInput').value) || 0;
             const container = document.getElementById('calculation-list');
             const alertMsg = document.getElementById('alert-msg');
-            
             if(val < 300 && val > 0) alertMsg.classList.remove('hidden');
             else alertMsg.classList.add('hidden');
 
             let res = {...baseData};
             if (val > 330) { 
                 const surplus = val - 330; 
-                res.World += surplus * 0.8; 
-                res.Crypto += surplus * 0.2; 
+                res.World += surplus * 0.8; res.Crypto += surplus * 0.2; 
             } else { 
-                const ratio = val / 330; 
-                Object.keys(baseData).forEach(k => res[k] *= ratio); 
+                const ratio = val / 330; Object.keys(baseData).forEach(k => res[k] *= ratio); 
             }
             
             container.innerHTML = Object.keys(res).map(k => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5 mb-2">
                     <div class="flex flex-col max-w-[65%]">
-                        <span class="text-[10px] font-black text-white uppercase tracking-tight leading-none mb-1">${k}</span>
-                        <span class="text-[6.5px] font-medium text-slate-500 uppercase leading-tight tracking-tight truncate">
-                            ${etfDetails[k] || ""}
-                        </span>
+                        <span class="text-[10px] font-black text-white uppercase tracking-tight mb-1">${k}</span>
+                        <span class="text-[6.5px] font-medium text-slate-500 uppercase truncate">${etfDetails[k] || ""}</span>
                     </div>
-                    <div class="text-right">
-                        <span class="text-lg font-black text-white leading-none">${res[k].toFixed(2)}€</span>
-                    </div>
+                    <div class="text-right"><span class="text-lg font-black text-white">${res[k].toFixed(2)}€</span></div>
                 </div>`).join('');
         }
 
@@ -264,7 +254,6 @@
             const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
             const totalCapital = history.reduce((sum, item) => sum + item.amount, 0);
             const streak = history.length;
-            
             const monthlyIncome = (totalCapital * 0.04) / 12;
             const progress = Math.min((monthlyIncome / currentGoalRente) * 100, 100);
 
@@ -286,7 +275,7 @@
                 for(let i=0; i<y*12; i++) cap = (cap + dca) * (1 + 0.07/12);
                 const r = (cap * 0.04)/12;
                 return `<div class="border-l-2 border-gold/40 pl-4 py-1 flex justify-between items-center">
-                    <div><p class="text-[8px] text-gold font-black uppercase tracking-widest">Horizon ${y} ans</p><p class="text-xl font-black">${cap.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0})}</p></div>
+                    <div><p class="text-[8px] text-gold font-black uppercase">Horizon ${y} ans</p><p class="text-xl font-black">${cap.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0})}</p></div>
                     <div class="text-right"><p class="text-[7px] text-slate-500 font-bold uppercase">Rente/mois</p><p class="text-sm font-black ${r >= currentGoalRente ? 'text-green-400' : 'text-gold/80'}">${r.toLocaleString('fr-FR',{maximumFractionDigits:0})}€</p></div>
                 </div>`;
             }).join('');
@@ -307,12 +296,16 @@
             setup('geoChart', [70, 20, 10], ['#ef4444', '#D4AF37', '#6366f1']);
         }
 
-        function loadSymbol(symbol) {
+        function loadSymbol(symbol, btn) {
+            if(btn) {
+                document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('market-btn-active'));
+                btn.classList.add('market-btn-active');
+            }
             new TradingView.widget({
                 "autosize": true, "symbol": symbol, "interval": "D", "timezone": "Europe/Paris",
                 "theme": "dark", "style": "3", "locale": "fr", "container_id": "tv_container",
                 "backgroundColor": "#010409", "gridColor": "rgba(212, 175, 55, 0.05)",
-                "hide_top_toolbar": false, "allow_symbol_change": true, "save_image": false
+                "hide_top_toolbar": false, "allow_symbol_change": false, "save_image": false
             });
         }
 
@@ -331,13 +324,13 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
-            if(id === 'market') loadSymbol('EURONEXT:CW8');
+            if(id === 'market') loadSymbol('EURONEXT:WPEA', document.querySelector('.market-btn'));
             if(id === 'stats' || id === 'fire' || id === 'main') setTimeout(updateAll, 50);
         }
 
         function saveVault() { localStorage.setItem('invest_vault', document.getElementById('vault-input').value); }
         function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Historique copié !"); }
-        function hardReset() { if(confirm("Attention : supprimer tout l'historique ?")) { localStorage.clear(); location.reload(); } }
+        function hardReset() { if(confirm("Supprimer toutes les données ?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
