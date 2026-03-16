@@ -3,320 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.1.8 - Terminal</title>
+    <title>Invest Pilot V5.4.0 - Pixel Elite</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#010409">
-    <link rel="apple-touch-icon" href="1773692905742.png">
+    <meta name="theme-color" content="#000000">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     
     <style>
-        :root { --gold: #D4AF37; --bg: #010409; --card: rgba(20,25,35,0.8); }
+        :root { --gold: #D4AF37; --bg: #000000; --card: #0a0a0a; }
         body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
+        /* OLED Deep Black */
         .glass-card { 
-            background: linear-gradient(135deg, var(--card) 0%, rgba(5,10,20,0.9) 100%);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-radius: 24px; padding: 24px; margin-bottom: 20px;
+            background: var(--card);
+            border: 1px solid #1a1a1a;
+            border-radius: 20px; padding: 20px; margin-bottom: 16px;
         }
 
-        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #05070a; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(212,175,55,0.1); }
-        #sidebar.open { left: 0; }
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2500; display: none; backdrop-filter: blur(8px); }
-
-        .nav-btn { font-size: 9px; font-weight: 800; color: #484f58; flex: 1; text-align: center; padding: 18px 0; border-bottom: 2px solid transparent; text-transform: uppercase; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #404040; flex: 1; text-align: center; padding: 20px 0; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
         .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
 
-        .page { display: none; padding: 20px; padding-bottom: 120px; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page { display: none; padding: 16px; padding-bottom: 100px; animation: fadeIn 0.2s ease-out; }
         .active { display: block; }
-        
-        .grade-card { opacity: 0.2; filter: grayscale(1); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); border-radius: 20px; padding: 10px; border: 2px solid transparent; }
-        .grade-active { opacity: 1; filter: grayscale(0); transform: scale(1.05); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .copper-glow { border-color: #cd7f32 !important; box-shadow: 0 0 15px rgba(205, 127, 50, 0.3); background: rgba(205, 127, 50, 0.05); }
-        .bronze-glow { border-color: #b87333 !important; box-shadow: 0 0 15px rgba(184, 115, 51, 0.3); background: rgba(184, 115, 51, 0.05); }
-        .silver-glow { border-color: #C0C0C0 !important; box-shadow: 0 0 15px rgba(192, 192, 192, 0.3); background: rgba(192, 192, 192, 0.05); }
+        .market-select, .surplus-select {
+            background: #111;
+            border: 1px solid #222;
+            color: var(--gold);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 12px;
+            font-weight: 800;
+            width: 100%;
+            outline: none;
+            appearance: none;
+            text-transform: uppercase;
+        }
 
-        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #8a6d3b, var(--gold)); width: 0%; transition: 1.5s ease-in-out; }
-        
-        .stat-dot { width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px; }
+        .copy-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+        .copy-btn:active { background: var(--gold); color: #000; }
 
-        /* Style des boutons Market */
-        .market-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.1); padding: 10px 5px; rounded: 12px; font-size: 7px; font-weight: 900; color: #64748b; text-transform: uppercase; transition: 0.3s; }
-        .market-btn-active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.05); }
+        /* Ghost Mode Logic */
+        .ghost-hidden { filter: blur(12px) grayscale(1); pointer-events: none; transition: 0.3s; }
+        .ghost-text { filter: blur(6px); user-select: none; }
+
+        #lock-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .pin-dot { height: 12px; width: 12px; border: 2px solid var(--gold); border-radius: 50%; margin: 0 8px; transition: 0.2s; }
+        .pin-dot.filled { background: var(--gold); }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div id="overlay" onclick="toggleSidebar()"></div>
-    
-    <div id="sidebar">
-        <p class="text-[10px] font-black text-gold uppercase tracking-[3px] mb-4 text-center">Elite Tracker</p>
-        <div class="bg-white/5 rounded-2xl p-4 border border-white/5 mb-6 text-center">
-            <p class="text-[9px] text-slate-500 font-bold uppercase mb-1">Série DCA</p>
-            <p class="text-3xl font-black text-white"><span id="streak-val">0</span> <small class="text-xs text-gold">MOIS</small></p>
+    <div id="lock-screen">
+        <div class="mb-12 italic font-black text-gold text-4xl tracking-tighter">PILOT</div>
+        <div class="flex mb-8" id="pinDots">
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
         </div>
-        <textarea id="vault-input" oninput="saveVault()" class="w-full h-48 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none mb-6" placeholder="Notes stratégiques..."></textarea>
-        <button onclick="exportData()" class="w-full p-4 bg-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 border border-white/5 mb-2">Export JSON</button>
-        <button onclick="hardReset()" class="w-full p-4 bg-red-900/10 rounded-xl text-[10px] font-black uppercase text-red-500/70">Reset Global</button>
-    </div>
-
-    <div id="lock-screen" class="fixed inset-0 bg-[#010409] z-[5000] flex flex-col items-center justify-center">
-        <img src="1773692905742.png" class="w-24 h-24 rounded-3xl mb-10 border border-gold/20 p-1">
-        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent text-center text-5xl w-40 border-b-2 border-gold pb-2 text-gold outline-none">
+        <input type="password" id="pinInput" maxlength="4" autofocus class="opacity-0 absolute">
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="p-6 pt-12 flex justify-between items-center border-b border-white/5 bg-[#010409]/90 sticky top-0 z-50">
-            <button onclick="toggleSidebar()" class="text-gold p-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg></button>
-            <div class="text-center">
-                <p id="alert-msg" class="text-[8px] font-black text-gold animate-pulse mb-1 hidden uppercase tracking-widest">Alerte : DCA Insuffisant</p>
-                <span class="text-[11px] font-black text-white uppercase tracking-widest italic">Elite Wealth V5.1.8</span>
-            </div>
-            <img src="1773692905742.png" class="w-10 h-10 rounded-xl border border-gold/30">
+        <header class="p-6 pt-12 flex justify-between items-center bg-black sticky top-0 z-50 border-b border-[#111]">
+            <div class="w-10"></div>
+            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth</div>
+            <button onclick="toggleGhost()" id="ghostBtn" class="w-10 h-10 rounded-xl border border-[#222] flex items-center justify-center text-xl transition-all active:scale-90">
+                👻
+            </button>
         </header>
 
-        <nav class="flex border-b border-white/5 sticky top-[95px] bg-[#010409] z-50">
-            <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
-            <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
-            <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
-            <button onclick="showPage('market', this)" class="nav-btn">LIVE</button>
+        <nav class="flex bg-black sticky top-[95px] z-50 border-b border-[#111]">
+            <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA Plan</button>
+            <button onclick="showPage('market', this)" class="nav-btn">Live Market</button>
         </nav>
 
         <div id="main" class="page active">
-            <div class="glass-card mb-6 text-center">
-                <p class="text-[9px] font-black text-gold/50 uppercase mb-6 tracking-[2px]">Grades de Rigueur</p>
-                <div class="grid grid-cols-3 gap-4">
-                    <div id="g-1" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/6213/6213125.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">CUIVRE</p></div>
-                    <div id="g-3" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">BRONZE</p></div>
-                    <div id="g-6" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">ARGENT</p></div>
-                </div>
-            </div>
             <div class="glass-card">
-                <div class="flex items-end gap-4 mb-8">
-                    <div class="w-full">
-                        <p class="text-[9px] font-black text-slate-500 uppercase mb-1 ml-1 tracking-widest">Montant DCA</p>
-                        <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black w-full tracking-tighter bg-transparent outline-none">
-                    </div>
-                    <button onclick="saveToHistory()" class="bg-gold w-16 h-16 rounded-2xl flex items-center justify-center mb-1 active:scale-90 transition-all shadow-lg shadow-gold/20"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><path d="M5 13l4 4L19 7" stroke-linecap="round"/></svg></button>
-                </div>
-                <div id="calculation-list" class="space-y-3"></div>
+                <span class="text-[8px] font-black text-zinc-600 uppercase mb-2 block tracking-widest">Budget Mensuel</span>
+                <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black bg-transparent outline-none text-white w-full tracking-tighter amount-display">
             </div>
-        </div>
 
-        <div id="fire" class="page">
-            <div class="glass-card text-center relative">
-                <button onclick="setNewGoal()" class="absolute right-4 top-4 text-slate-600 hover:text-gold">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-                </button>
-                <p class="text-[10px] font-black text-gold uppercase mb-6 tracking-[2px]">Liberté Financière</p>
-                <div class="mb-8">
-                    <div class="flex justify-between items-end mb-1 text-[9px] font-black">
-                        <span class="text-slate-500 uppercase">Progression Cible</span>
-                        <span class="text-gold" id="goal-percent">0%</span>
-                    </div>
-                    <div class="progress-container"><div id="goal-bar" class="progress-bar"></div></div>
-                    <p class="text-[8px] text-slate-500 font-bold uppercase mt-1 italic">Cible : <span id="goal-label">500</span> € / mois</p>
-                </div>
-                <div class="text-5xl font-black text-white mb-2" id="rente-val">0 €</div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase mb-10 tracking-widest italic">Rente mensuelle passive</p>
-                <div id="forecast-list" class="space-y-4 text-left border-t border-white/5 pt-6"></div>
-            </div>
-        </div>
-
-        <div id="stats" class="page">
-            <div class="glass-card mb-6">
-                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest">Allocation Actifs</p>
-                <div class="h-48 mb-8"><canvas id="allocChart"></canvas></div>
-                <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
-                    <div>
-                        <div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">PEA</span>
-                        <span class="text-[11px] font-black text-white">85%</span>
-                    </div>
-                    <div>
-                        <div class="stat-dot bg-[#10b981] shadow-[0_0_8px_#10b981] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">CRYPTO</span>
-                        <span class="text-[11px] font-black text-white">11%</span>
-                    </div>
-                    <div>
-                        <div class="stat-dot bg-[#f59e0b] shadow-[0_0_8px_#f59e0b] mx-auto"></div>
-                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">CTO</span>
-                        <span class="text-[11px] font-black text-white">4%</span>
-                    </div>
-                </div>
-            </div>
             <div class="glass-card">
-                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest">Zones Géo</p>
-                <div class="h-48 mb-8"><canvas id="geoChart"></canvas></div>
-                <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
-                    <div><div class="stat-dot bg-[#ef4444] shadow-[0_0_8px_#ef4444] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">USA</span><span class="text-[11px] font-black text-white">70%</span></div>
-                    <div><div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">EURO</span><span class="text-[11px] font-black text-white">20%</span></div>
-                    <div><div class="stat-dot bg-[#6366f1] shadow-[0_0_8px_#6366f1] mx-auto"></div><span class="text-[8px] font-black text-slate-500 uppercase mb-1 block italic">EM</span><span class="text-[11px] font-black text-white">10%</span></div>
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[8px] font-black text-gold uppercase tracking-widest">Mode Surplus</span>
+                    <input type="checkbox" id="surplusToggle" onchange="calculateDCA()" class="w-6 h-6 rounded-full accent-gold">
+                </div>
+                
+                <div id="surplus-controls" class="space-y-4 opacity-20 pointer-events-none transition-all">
+                    <input type="number" id="surplusAmount" value="50" oninput="calculateDCA()" class="text-3xl font-black bg-transparent border-b border-zinc-800 outline-none text-white w-full pb-2 amount-display">
+                    <select id="surplusTarget" onchange="calculateDCA()" class="surplus-select">
+                        <option value="STRAT">Pilier (80% WPEA / 20% BTC)</option>
+                        <option value="WPEA">100% MSCI World</option>
+                        <option value="BTC">100% Bitcoin</option>
+                    </select>
                 </div>
             </div>
+
+            <div id="calculation-list" class="space-y-3 pb-10"></div>
         </div>
 
         <div id="market" class="page">
-            <p class="text-[10px] font-black text-gold uppercase mb-4 tracking-widest text-center">Flux Temps Réel Stratégie</p>
-            <div class="grid grid-cols-4 gap-1 mb-4 overflow-x-auto">
-                <button onclick="loadSymbol('EURONEXT:WPEA', this)" class="market-btn market-btn-active">WPEA</button>
-                <button onclick="loadSymbol('EURONEXT:ESE', this)" class="market-btn">ESE</button>
-                <button onclick="loadSymbol('EURONEXT:PAEEM', this)" class="market-btn">PAEEM</button>
-                <button onclick="loadSymbol('EURONEXT:PMEH', this)" class="market-btn">PMEH</button>
-                <button onclick="loadSymbol('EURONEXT:COFA', this)" class="market-btn">COFA</button>
-                <button onclick="loadSymbol('EURONEXT:ASAM', this)" class="market-btn">ASAM</button>
-                <button onclick="loadSymbol('BINANCE:BTCUSDT', this)" class="market-btn">BTC</button>
-                <button onclick="loadSymbol('BINANCE:ETHUSDT', this)" class="market-btn">ETH</button>
+            <div id="price-ticker-container" class="h-16 rounded-2xl border border-[#111] overflow-hidden mb-4 bg-[#050505]">
+                <div id="tv-ticker-widget"></div>
             </div>
-            <div id="tv_container" class="glass-card h-[450px] p-0 overflow-hidden border-gold/20"></div>
-            <p class="text-center text-[7px] text-slate-600 font-bold uppercase mt-4 tracking-widest">Données fournies par TradingView</p>
+            <select id="assetSelector" onchange="updateMarketView(this.value)" class="market-select mb-4">
+                <option value="EURONEXT:WPEA">MSCI World (WPEA)</option>
+                <option value="EURONEXT:ESE">S&P 500 (ESE)</option>
+                <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+                <option value="EURONEXT:COFA">Coface (COFA)</option>
+            </select>
+            <div id="tv_player" class="glass-card h-[460px] p-0 overflow-hidden border-[#222]"></div>
         </div>
     </div>
 
     <script>
+        // --- MODIFIER LE PIN ICI ---
         const PIN_SECRET = "1104"; 
-        let currentGoalRente = localStorage.getItem('invest_goal') || 500;
-        const baseData = { World: 192, Coface: 30, Immo: 27, EM: 22, Def: 12, SP500: 12, Crypto: 35 };
-        let charts = {};
 
-        const etfDetails = {
-            World: "iShares MSCI World Swap PEA UCITS ETF (WPEA)",
-            Coface: "Coface SA - Assurance-crédit Internationale",
-            Immo: "Amundi PEA Immobilier Europe (PMEH)",
-            EM: "Amundi PEA MSCI Emerging Markets (PAEEM)",
-            Def: "BNP Paribas Easy Defense Europe UCITS ETF",
-            SP500: "BNP Paribas Easy S&P 500 UCITS ETF PEA (ESE)",
-            Crypto: "Digital Assets Strategy (BTC / Crypto Focus)"
-        };
+        const BASE_PLAN = { WPEA: 192, COFA: 30, PMEH: 27, PAEEM: 22, ASAM: 12, ESE: 12, Crypto: 35 };
+        let isGhost = false;
 
         function initApp() {
-            document.getElementById('pinInput').addEventListener('input', (e) => {
-                if(e.target.value === PIN_SECRET) {
+            const input = document.getElementById('pinInput');
+            const dots = document.querySelectorAll('.pin-dot');
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+                dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
+                
+                if(val === PIN_SECRET) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
-                    document.getElementById('vault-input').value = localStorage.getItem('invest_vault') || '';
-                    updateAll();
+                    calculateDCA();
+                } else if (val.length >= 4) {
+                    setTimeout(() => {
+                        e.target.value = '';
+                        dots.forEach(dot => dot.classList.remove('filled'));
+                    }, 200);
                 }
             });
+        }
+
+        function toggleGhost() {
+            isGhost = !isGhost;
+            const btn = document.getElementById('ghostBtn');
+            btn.style.borderColor = isGhost ? 'var(--gold)' : '#222';
+            btn.style.background = isGhost ? 'rgba(212,175,55,0.1)' : 'transparent';
+            
+            document.querySelectorAll('.amount-display').forEach(el => {
+                el.classList.toggle('ghost-text', isGhost);
+            });
+            
+            document.getElementById('tv_player').classList.toggle('ghost-hidden', isGhost);
             calculateDCA();
-        }
-
-        function toggleSidebar() { 
-            const s = document.getElementById('sidebar');
-            const o = document.getElementById('overlay');
-            s.classList.toggle('open');
-            o.style.display = s.classList.contains('open') ? 'block' : 'none';
-        }
-
-        function setNewGoal() {
-            const newGoal = prompt("Nouvelle cible rente mensuelle (€) :", currentGoalRente);
-            if(newGoal && !isNaN(newGoal)) {
-                currentGoalRente = parseInt(newGoal);
-                localStorage.setItem('invest_goal', currentGoalRente);
-                updateAll();
-            }
         }
 
         function calculateDCA() {
-            const val = parseFloat(document.getElementById('dcaInput').value) || 0;
+            const dcaBase = parseFloat(document.getElementById('dcaInput').value) || 0;
+            const useSurplus = document.getElementById('surplusToggle').checked;
+            const surplusVal = useSurplus ? (parseFloat(document.getElementById('surplusAmount').value) || 0) : 0;
+            const target = document.getElementById('surplusTarget').value;
             const container = document.getElementById('calculation-list');
-            const alertMsg = document.getElementById('alert-msg');
-            if(val < 300 && val > 0) alertMsg.classList.remove('hidden');
-            else alertMsg.classList.add('hidden');
+            const controls = document.getElementById('surplus-controls');
 
-            let res = {...baseData};
-            if (val > 330) { 
-                const surplus = val - 330; 
-                res.World += surplus * 0.8; res.Crypto += surplus * 0.2; 
-            } else { 
-                const ratio = val / 330; Object.keys(baseData).forEach(k => res[k] *= ratio); 
+            controls.style.opacity = useSurplus ? "1" : "0.2";
+            controls.style.pointerEvents = useSurplus ? "auto" : "none";
+
+            let res = {};
+            const ratio = dcaBase / 330;
+            Object.keys(BASE_PLAN).forEach(k => res[k] = BASE_PLAN[k] * ratio);
+
+            if(useSurplus && surplusVal > 0) {
+                if(target === "STRAT") { 
+                    res['WPEA'] += surplusVal * 0.8; 
+                    res['Crypto'] += surplusVal * 0.2; 
+                } else if (target === "WPEA") { res['WPEA'] += surplusVal; }
+                else if (target === "BTC") { res['Crypto'] += surplusVal; }
             }
-            
-            container.innerHTML = Object.keys(res).map(k => `
-                <div class="flex justify-between items-center p-3 bg-white/5 rounded-2xl border border-white/5 mb-2">
-                    <div class="flex flex-col max-w-[65%]">
-                        <span class="text-[10px] font-black text-white uppercase tracking-tight mb-1">${k}</span>
-                        <span class="text-[6.5px] font-medium text-slate-500 uppercase truncate">${etfDetails[k] || ""}</span>
+
+            container.innerHTML = Object.keys(res).map(k => {
+                const val = res[k].toFixed(2);
+                const isPrio = (useSurplus && ((target === "STRAT" && (k === 'WPEA' || k === 'Crypto')) || (target === k) || (target === 'BTC' && k === 'Crypto')));
+                const displayVal = isGhost ? "**.**" : val;
+                
+                return `
+                <div class="flex justify-between items-center p-5 bg-[#0a0a0a] rounded-2xl border ${isPrio ? 'border-gold/30 bg-gold/[0.02]' : 'border-[#1a1a1a]'}">
+                    <div>
+                        <span class="text-[9px] font-black text-zinc-500 uppercase tracking-tighter">${k}</span>
+                        <div class="text-2xl font-black text-white ${isGhost ? 'ghost-text' : ''}">${displayVal}€</div>
                     </div>
-                    <div class="text-right"><span class="text-lg font-black text-white">${res[k].toFixed(2)}€</span></div>
-                </div>`).join('');
-        }
-
-        function updateAll() {
-            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
-            const totalCapital = history.reduce((sum, item) => sum + item.amount, 0);
-            const streak = history.length;
-            const monthlyIncome = (totalCapital * 0.04) / 12;
-            const progress = Math.min((monthlyIncome / currentGoalRente) * 100, 100);
-
-            document.getElementById('rente-val').innerText = monthlyIncome.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + " €";
-            document.getElementById('goal-percent').innerText = progress.toFixed(1) + "%";
-            document.getElementById('goal-bar').style.width = progress + "%";
-            document.getElementById('goal-label').innerText = currentGoalRente;
-            document.getElementById('streak-val').innerText = streak;
-
-            const g1 = document.getElementById('g-1'), g3 = document.getElementById('g-3'), g6 = document.getElementById('g-6');
-            [g1, g3, g6].forEach(g => g.className = "grade-card");
-            if(streak >= 1) g1.classList.add('grade-active', 'copper-glow');
-            if(streak >= 3) g3.classList.add('grade-active', 'bronze-glow');
-            if(streak >= 6) g6.classList.add('grade-active', 'silver-glow');
-
-            const dca = parseFloat(document.getElementById('dcaInput').value) || 330;
-            document.getElementById('forecast-list').innerHTML = [10, 20, 35].map(y => {
-                let cap = totalCapital;
-                for(let i=0; i<y*12; i++) cap = (cap + dca) * (1 + 0.07/12);
-                const r = (cap * 0.04)/12;
-                return `<div class="border-l-2 border-gold/40 pl-4 py-1 flex justify-between items-center">
-                    <div><p class="text-[8px] text-gold font-black uppercase">Horizon ${y} ans</p><p class="text-xl font-black">${cap.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0})}</p></div>
-                    <div class="text-right"><p class="text-[7px] text-slate-500 font-bold uppercase">Rente/mois</p><p class="text-sm font-black ${r >= currentGoalRente ? 'text-green-400' : 'text-gold/80'}">${r.toLocaleString('fr-FR',{maximumFractionDigits:0})}€</p></div>
+                    <button onclick="copyToClipboard('${val}')" class="copy-btn">COPIER</button>
                 </div>`;
             }).join('');
-            renderCharts();
-            calculateDCA();
         }
 
-        function renderCharts() {
-            const setup = (id, data, colors) => {
-                if(charts[id]) charts[id].destroy();
-                charts[id] = new Chart(document.getElementById(id), {
-                    type: 'doughnut',
-                    data: { datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
-                    options: { cutout: '82%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
-            };
-            setup('allocChart', [85, 11, 4], ['#D4AF37', '#10b981', '#f59e0b']);
-            setup('geoChart', [70, 20, 10], ['#ef4444', '#D4AF37', '#6366f1']);
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
         }
 
-        function loadSymbol(symbol, btn) {
-            if(btn) {
-                document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('market-btn-active'));
-                btn.classList.add('market-btn-active');
-            }
+        function updateMarketView(symbol) {
+            document.getElementById('tv-ticker-widget').innerHTML = "";
+            const script = document.createElement('script');
+            script.src = "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
+            script.async = true;
+            script.innerHTML = JSON.stringify({ "symbol": symbol, "width": "100%", "colorTheme": "dark", "isTransparent": true, "locale": "fr" });
+            document.getElementById('tv-ticker-widget').appendChild(script);
+
+            document.getElementById('tv_player').innerHTML = "";
             new TradingView.widget({
-                "autosize": true, "symbol": symbol, "interval": "D", "timezone": "Europe/Paris",
-                "theme": "dark", "style": "3", "locale": "fr", "container_id": "tv_container",
-                "backgroundColor": "#010409", "gridColor": "rgba(212, 175, 55, 0.05)",
-                "hide_top_toolbar": false, "allow_symbol_change": false, "save_image": false
+                "width": "100%", "height": 460, "symbol": symbol, "interval": "D", "theme": "dark", "style": "3", "locale": "fr", "container_id": "tv_player", "backgroundColor": "#000000", "gridColor": "#111", "hide_top_toolbar": true
             });
-        }
-
-        function saveToHistory() {
-            const val = parseFloat(document.getElementById('dcaInput').value);
-            if(!val) return;
-            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
-            history.push({ amount: val, date: new Date().toISOString() });
-            localStorage.setItem('invest_history', JSON.stringify(history));
-            updateAll();
-            alert("Injection DCA enregistrée.");
         }
 
         function showPage(id, btn) {
@@ -324,13 +231,8 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
-            if(id === 'market') loadSymbol('EURONEXT:WPEA', document.querySelector('.market-btn'));
-            if(id === 'stats' || id === 'fire' || id === 'main') setTimeout(updateAll, 50);
+            if(id === 'market') updateMarketView(document.getElementById('assetSelector').value);
         }
-
-        function saveVault() { localStorage.setItem('invest_vault', document.getElementById('vault-input').value); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Historique copié !"); }
-        function hardReset() { if(confirm("Supprimer toutes les données ?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
