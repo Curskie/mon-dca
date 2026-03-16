@@ -3,142 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V3.6 - Full Control</title>
+    <title>Invest Pilot V3.10 - Ranked</title>
     
-    <link rel="apple-touch-icon" href="1773669549907.png">
-    <link rel="icon" type="image/png" href="1773669549907.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --blue: #3b82f6; --emerald: #10b981; }
-        body { background: #020617; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; }
+        :root { --blue: #3b82f6; --emerald: #10b981; --slate-950: #020617; }
+        body { background: var(--slate-950); -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; color: #f8fafc; font-family: ui-sans-serif, system-ui; }
         
-        /* Correction Swipe */
-        .page { display: none; min-height: 100vh; padding: 20px; padding-bottom: 150px; }
-        .active { display: block; animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page { display: none; min-height: 100vh; padding: 20px; padding-bottom: 160px; }
+        .active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Sidebar & Overlay */
-        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #0f172a; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
-        #sidebar.open { left: 0; box-shadow: 20px 0 60px rgba(0,0,0,0.8); }
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2500; display: none; backdrop-filter: blur(4px); }
+        #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #070e1d; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(255,255,255,0.05); overflow-y: auto; }
+        #sidebar.open { left: 0; box-shadow: 25px 0 80px rgba(0,0,0,0.9); }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2500; display: none; backdrop-filter: blur(8px); }
         
-        .card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(15px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); padding: 18px; margin-bottom: 16px; position: relative; }
-        .nav-btn { font-size: 10px; font-weight: 900; color: #475569; padding: 12px 0; border-bottom: 3px solid transparent; }
+        .card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 16px; }
+        .nav-btn { font-size: 11px; font-weight: 800; color: #64748b; padding: 14px 0; border-bottom: 2px solid transparent; }
         .nav-active { color: #3b82f6; border-bottom-color: #3b82f6; }
-        .ghost-mode .blur-val { filter: blur(14px); pointer-events: none; }
         
-        textarea { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; font-size: 11px; color: #cbd5e1; outline: none; width: 100%; }
-        canvas { max-width: 100% !important; max-height: 100% !important; }
+        /* RANKED BADGES */
+        .badge { filter: grayscale(1) opacity(0.1); transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); transform: translateY(10px); }
+        .badge.unlocked { filter: grayscale(0) opacity(1); transform: translateY(0); }
+        .badge-card { background: rgba(255,255,255,0.02); border-radius: 20px; padding: 14px 4px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        .ghost-mode .blur-val { filter: blur(15px); pointer-events: none; }
     </style>
 </head>
-<body class="text-slate-100 font-sans">
+<body>
 
     <div id="overlay" onclick="toggleSidebar()"></div>
     
     <div id="sidebar">
-        <h2 class="text-blue-500 font-black text-xs uppercase tracking-[0.2em] mb-6 italic">Terminal de Contrôle</h2>
+        <h2 class="text-blue-500 font-black text-[10px] uppercase tracking-[0.3em] mb-6 italic text-center">Niveau de Prestige</h2>
         
-        <div class="mb-6 p-4 bg-blue-600/10 border border-blue-500/30 rounded-2xl text-center">
-            <p class="text-[9px] text-blue-400 font-bold uppercase mb-1">Discipline DCA</p>
-            <p class="text-2xl font-black text-white"><span id="streak-count">0</span> Mois</p>
-            <p class="text-[8px] text-slate-500 uppercase mt-1 italic">Série en cours 🔥</p>
+        <p class="text-[9px] text-slate-500 font-bold uppercase mb-4 tracking-widest text-center">Grades d'Investisseur</p>
+        <div class="grid grid-cols-3 gap-2.5 mb-8">
+            <div class="badge-card badge" id="badge-300">
+                <div class="text-2xl mb-1">🧱</div>
+                <div class="text-[7px] font-black uppercase text-orange-700">Cuivre</div>
+            </div>
+            <div class="badge-card badge" id="badge-500">
+                <div class="text-2xl mb-1">🥉</div>
+                <div class="text-[7px] font-black uppercase text-orange-400">Bronze</div>
+            </div>
+            <div class="badge-card badge" id="badge-750">
+                <div class="text-2xl mb-1">⛓️</div>
+                <div class="text-[7px] font-black uppercase text-slate-400">Fer</div>
+            </div>
+            <div class="badge-card badge" id="badge-1000">
+                <div class="text-2xl mb-1">🥈</div>
+                <div class="text-[7px] font-black uppercase text-slate-200">Argent</div>
+            </div>
+            <div class="badge-card badge" id="badge-5000">
+                <div class="text-2xl mb-1">🥇</div>
+                <div class="text-[7px] font-black uppercase text-yellow-500">Or</div>
+            </div>
+            <div class="badge-card badge" id="badge-10000">
+                <div class="text-2xl mb-1">💎</div>
+                <div class="text-[7px] font-black uppercase text-cyan-400">Platine</div>
+            </div>
         </div>
 
         <div class="space-y-6">
+            <div class="p-5 bg-blue-600/5 border border-blue-500/20 rounded-3xl text-center shadow-inner">
+                <p class="text-[9px] text-blue-400 font-bold uppercase mb-1 italic">Série de DCA</p>
+                <p class="text-3xl font-black"><span id="streak-count">0</span> <small class="text-xs font-normal opacity-50 uppercase">Mois</small></p>
+            </div>
             <div>
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 flex justify-between tracking-widest">Frais Annuels <span class="text-emerald-400 font-mono" id="frais-val">0€</span></p>
-                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 w-1/3"></div></div>
+                <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-widest">Journal Stratégique</p>
+                <textarea id="convictionNote" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-[11px] text-slate-300 outline-none focus:border-blue-500/30" oninput="saveNote()"></textarea>
             </div>
-
-            <div>
-                <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-widest">Journal de Conviction</p>
-                <textarea id="convictionNote" rows="5" placeholder="Pourquoi investis-tu aujourd'hui ?" oninput="saveNote()"></textarea>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-                <a href="https://traderepublic.com" target="_blank" class="p-3 bg-slate-800 rounded-xl text-center text-[9px] font-bold">TRADE REP.</a>
-                <a href="https://fr.tradingview.com" target="_blank" class="p-3 bg-slate-800 rounded-xl text-center text-[9px] font-bold">TRADINGVIEW</a>
-            </div>
-
-            <div class="pt-6 border-t border-white/5 space-y-2">
-                <button onclick="exportData()" class="w-full text-left p-3 rounded-xl bg-slate-900 text-[9px] font-bold uppercase border border-white/5">📤 Backup JSON</button>
-                <button onclick="clearData()" class="w-full text-left p-3 rounded-xl bg-red-900/10 text-red-500 text-[9px] font-bold uppercase">⚠️ Reset Global</button>
-            </div>
+            <button onclick="exportData()" class="w-full p-4 bg-slate-900 rounded-2xl text-[9px] font-black uppercase tracking-widest border border-white/5 active:bg-slate-800">Export JSON</button>
         </div>
     </div>
 
     <div id="lock-screen" class="fixed inset-0 bg-[#020617] z-[5000] flex flex-col items-center justify-center">
-        <img src="1773669549907.png" class="w-20 h-20 rounded-2xl mb-12 shadow-2xl">
-        <div id="pin-dots" class="flex gap-5 mb-12">
-            <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-700"></div>
-            <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-700"></div>
-            <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-700"></div>
-            <div class="w-3.5 h-3.5 rounded-full border-2 border-slate-700"></div>
+        <img src="1773669549907.png" class="w-20 h-20 rounded-3xl mb-12 shadow-2xl border border-white/5 p-1">
+        <div id="pin-dots" class="flex gap-6 mb-12">
+            <div class="w-3 h-3 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-3 h-3 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-3 h-3 rounded-full border-2 border-slate-800 transition-all"></div>
+            <div class="w-3 h-3 rounded-full border-2 border-slate-800 transition-all"></div>
         </div>
         <input type="password" id="pinInput" maxlength="4" inputmode="numeric" autofocus class="absolute opacity-0">
     </div>
 
-    <header class="sticky top-0 z-[1000] flex justify-between items-center px-6 pt-12 pb-4 bg-[#020617]/90 backdrop-blur-md">
-        <button onclick="toggleSidebar()" class="p-2 -ml-2 text-slate-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+    <header class="sticky top-0 z-[1000] flex justify-between items-center px-6 pt-14 pb-4 bg-[#020617]/90 backdrop-blur-xl">
+        <button onclick="toggleSidebar()" class="p-2 -ml-2 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16" /></svg>
         </button>
-        <div class="flex items-center gap-3">
-            <button onclick="toggleGhost()" class="p-2 bg-slate-900 rounded-xl border border-white/5">👁️</button>
-            <img src="1773669549907.png" class="w-8 h-8 rounded-lg border border-white/10 shadow-lg">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleGhost()" class="w-10 h-10 flex items-center justify-center bg-slate-900 rounded-2xl border border-white/5 active:scale-90">👁️</button>
+            <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-white/10 shadow-xl">
         </div>
     </header>
 
-    <nav class="sticky top-[100px] z-[1000] flex justify-around bg-[#020617] border-b border-white/5">
-        <button onclick="showPage('main', this)" class="nav-btn nav-active w-full uppercase">DCA</button>
-        <button onclick="showPage('freedom', this)" class="nav-btn w-full uppercase">Liberté</button>
-        <button onclick="showPage('history', this)" class="nav-btn w-full uppercase">Suivi</button>
+    <nav class="sticky top-[104px] z-[1000] flex justify-around bg-[#020617] border-b border-white/5 px-4">
+        <button onclick="showPage('main', this)" class="nav-btn nav-active w-full uppercase">Tactique</button>
+        <button onclick="showPage('freedom', this)" class="nav-btn w-full uppercase">Indépendance</button>
+        <button onclick="showPage('history', this)" class="nav-btn w-full uppercase">Analyses</button>
     </nav>
 
     <div id="main" class="page active">
-        <div class="card bg-gradient-to-br from-blue-600/10 to-transparent">
-            <p class="text-[9px] font-black text-blue-500 uppercase mb-4 italic" id="current-date"></p>
-            <div class="flex gap-3 mb-6 items-center">
-                <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="w-full bg-transparent text-5xl font-mono font-bold outline-none">
-                <button onclick="saveToHistory()" class="bg-blue-600 px-6 py-4 rounded-2xl font-black text-[10px] active:scale-90">VALIDER</button>
+        <div class="card bg-gradient-to-br from-blue-600/5 to-transparent border-blue-500/10">
+            <p class="text-[10px] font-black text-blue-500 uppercase mb-5 tracking-[0.2em]" id="current-date"></p>
+            <div class="flex gap-4 mb-8 items-end">
+                <div class="flex-1">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase mb-1 ml-1 tracking-widest">Injection</p>
+                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="w-full bg-transparent text-6xl font-black outline-none tracking-tighter">
+                </div>
+                <button onclick="saveToHistory()" class="bg-blue-600 w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 shadow-lg shadow-blue-600/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                </button>
             </div>
-            <div id="calculation-list" class="space-y-2"></div>
+            <div id="calculation-list" class="space-y-2.5"></div>
         </div>
     </div>
 
     <div id="freedom" class="page">
-        <div class="card text-center py-12">
-            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Rente Passive Mensuelle</p>
-            <div class="text-6xl font-black mb-6 blur-val tracking-tighter" id="rente-val">0 €</div>
-            <div class="h-3 bg-slate-900 rounded-full overflow-hidden w-full mb-3 border border-white/5">
-                <div id="freedom-progress" class="h-full bg-gradient-to-r from-blue-600 to-emerald-400 transition-all duration-1000"></div>
-            </div>
-            <div class="flex justify-between text-[10px] font-black uppercase text-slate-500">
-                <span>Objectif 1500€</span>
-                <span class="text-emerald-400"><span id="freedom-percent">0</span>%</span>
+        <div class="card text-center py-10 relative">
+            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Revenu Passif Mensuel</p>
+            <div class="text-7xl font-black mb-10 blur-val tracking-tighter" id="rente-val">0 €</div>
+            <div class="space-y-6 text-left px-2">
+                <div id="step-1" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>☕ Abonnements (50€)</span><span id="rem-50" class="font-mono">50€</span></div>
+                <div id="step-2" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>🛒 Courses (250€)</span><span id="rem-250" class="font-mono">250€</span></div>
+                <div id="step-3" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>🏠 Loyer (800€)</span><span id="rem-800" class="font-mono">800€</span></div>
+                <div class="h-2 bg-slate-950 rounded-full mt-4 overflow-hidden border border-white/5">
+                    <div id="freedom-progress" class="h-full bg-gradient-to-r from-blue-600 to-emerald-400 transition-all duration-1000"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="history" class="page">
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="card m-0 flex flex-col items-center justify-center h-48">
-                <div class="w-full h-28 relative">
-                    <canvas id="allocationChart"></canvas>
+        <div class="grid grid-cols-1 gap-4 mb-6">
+            <div class="card m-0 flex flex-col items-center">
+                <div class="w-full h-52 relative mb-6"><canvas id="allocationChart"></canvas></div>
+                <div class="grid grid-cols-3 w-full gap-2 text-[9px] font-black text-slate-400 text-center uppercase">
+                    <div class="p-3 bg-white/5 rounded-2xl">PEA <br><span class="text-blue-500">85%</span></div>
+                    <div class="p-3 bg-white/5 rounded-2xl">CRYPTO <br><span class="text-emerald-500">11%</span></div>
+                    <div class="p-3 bg-white/5 rounded-2xl">CTO <br><span class="text-orange-500">4%</span></div>
                 </div>
-                <p class="text-[8px] font-black text-slate-500 uppercase mt-4">Enveloppes</p>
-            </div>
-            <div class="card m-0 flex flex-col items-center justify-center h-48">
-                <div class="w-full h-28 relative">
-                    <canvas id="geoChart"></canvas>
-                </div>
-                <p class="text-[8px] font-black text-slate-500 uppercase mt-4">Géographie</p>
             </div>
         </div>
-        <div id="history-list" class="space-y-2 blur-val mt-4"></div>
+        <div id="history-list" class="space-y-2 blur-val"></div>
     </div>
 
     <script>
@@ -146,12 +155,14 @@
         const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
         let charts = {};
 
-        // PIN
         const pinInput = document.getElementById('pinInput');
         const dots = document.querySelectorAll('#pin-dots div');
         pinInput.addEventListener('input', (e) => {
             const val = e.target.value;
-            dots.forEach((dot, i) => dot.style.background = i < val.length ? '#3b82f6' : 'transparent');
+            dots.forEach((dot, i) => {
+                dot.style.background = i < val.length ? '#3b82f6' : 'transparent';
+                dot.style.borderColor = i < val.length ? '#3b82f6' : '#1e293b';
+            });
             if(val === PIN_CODE) { document.getElementById('lock-screen').style.display = 'none'; updateAll(); }
             else if(val.length === 4) e.target.value = '';
         });
@@ -169,39 +180,63 @@
             if (val > 330) { const s = val - 330; res.world += s * 0.8; res.crypto += s * 0.2; }
             else { const r = val / 330; Object.keys(baseData).forEach(k => res[k] *= r); }
             container.innerHTML = Object.keys(res).map(k => `
-                <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <span class="text-[9px] font-bold text-slate-500 uppercase">${k}</span>
-                    <span class="font-mono text-lg font-bold">${res[k].toFixed(2)}€</span>
+                <div class="flex justify-between items-center p-4 bg-white/[0.03] rounded-2xl border border-white/[0.03]">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${k}</span>
+                    <span class="font-mono text-xl font-black">${res[k].toFixed(2)}€</span>
                 </div>`).join('');
         }
 
         function updateAll() {
             const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
             const total = history.reduce((sum, item) => sum + item.amount, 0);
+            const rente = (total * 0.04) / 12;
             
-            // Stats
-            document.getElementById('rente-val').innerText = ((total * 0.04) / 12).toFixed(2) + " €";
-            const percent = Math.min((total / 450000) * 100, 100);
-            document.getElementById('freedom-progress').style.width = percent + "%";
-            document.getElementById('freedom-percent').innerText = percent.toFixed(1);
+            document.getElementById('rente-val').innerText = rente.toFixed(2) + " €";
+            
+            updateStep(1, rente, 50, 'rem-50');
+            updateStep(2, rente, 250, 'rem-250');
+            updateStep(3, rente, 800, 'rem-800');
+            
+            // Grades Logic
+            const ranks = [
+                {id: 'badge-300', val: 300}, {id: 'badge-500', val: 500},
+                {id: 'badge-750', val: 750}, {id: 'badge-1000', val: 1000},
+                {id: 'badge-5000', val: 5000}, {id: 'badge-10000', val: 10000}
+            ];
+            ranks.forEach(r => {
+                const el = document.getElementById(r.id);
+                if(total >= r.val) el.classList.add('unlocked');
+                else el.classList.remove('unlocked');
+            });
+
+            document.getElementById('freedom-progress').style.width = Math.min((rente / 1500) * 100, 100) + "%";
             document.getElementById('streak-count').innerText = history.length;
-            document.getElementById('frais-val').innerText = (total * 0.0022).toFixed(1) + "€";
             document.getElementById('convictionNote').value = localStorage.getItem('user_note') || "";
 
             renderCharts();
 
-            // Historique
             document.getElementById('history-list').innerHTML = history.slice().reverse().map(item => `
-                <div class="flex justify-between p-4 bg-white/5 rounded-2xl border border-white/5 mb-2">
-                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-tighter">${item.date}</span>
-                    <span class="font-mono font-bold text-blue-400">+${item.amount.toFixed(0)}€</span>
+                <div class="flex justify-between p-5 bg-white/[0.02] rounded-3xl border border-white/[0.05] mb-2">
+                    <span class="text-[10px] font-black text-slate-500 uppercase">${item.date}</span>
+                    <span class="font-mono font-bold text-blue-500">+${item.amount.toFixed(0)}€</span>
                 </div>`).join('');
+        }
+
+        function updateStep(num, current, target, elId) {
+            const el = document.getElementById('step-' + num);
+            const remEl = document.getElementById(elId);
+            if(current >= target) {
+                el.style.color = "#10b981";
+                remEl.innerText = "DONE";
+            } else {
+                el.style.color = "#475569";
+                remEl.innerText = (target - current).toFixed(0) + "€";
+            }
         }
 
         function renderCharts() {
             const config = {
-                allocationChart: { data: [85, 11, 4], colors: ['#3b82f6', '#f59e0b', '#10b981'] },
-                geoChart: { data: [70, 20, 10], colors: ['#ef4444', '#3b82f6', '#6366f1'] }
+                allocationChart: { data: [85, 11, 4], colors: ['#3b82f6', '#10b981', '#f59e0b'] }
             };
             Object.keys(config).forEach(id => {
                 const ctx = document.getElementById(id);
@@ -210,7 +245,7 @@
                 charts[id] = new Chart(ctx, {
                     type: 'doughnut',
                     data: { datasets: [{ data: config[id].data, backgroundColor: config[id].colors, borderWidth: 0 }] },
-                    options: { cutout: '82%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                    options: { cutout: '85%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
                 });
             });
         }
@@ -222,27 +257,23 @@
             history.push({ date: new Date().toLocaleDateString('fr-FR', { month: 'short', year: '2y' }), amount: val });
             localStorage.setItem('invest_history', JSON.stringify(history));
             updateAll();
-            alert("Position enregistrée !");
         }
-
-        function saveNote() { localStorage.setItem('user_note', document.getElementById('convictionNote').value); }
 
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
-            if(id === 'history') setTimeout(renderCharts, 100);
-            window.scrollTo(0,0);
+            if(id === 'history') setTimeout(renderCharts, 150);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function toggleGhost() { document.body.classList.toggle('ghost-mode'); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("JSON copié !"); }
-        function clearData() { if(confirm("Réinitialiser toutes les données ?")) { localStorage.clear(); location.reload(); } }
+        function saveNote() { localStorage.setItem('user_note', document.getElementById('convictionNote').value); }
+        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Data copiée !"); }
 
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
         calculateDCA();
-        window.onclick = () => { if(document.getElementById('lock-screen').style.display !== 'none') pinInput.focus(); }
     </script>
 </body>
 </html>
