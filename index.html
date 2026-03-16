@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.1.2 - Prestige</title>
+    <title>Invest Pilot V5.1.5 - Elite</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -36,7 +36,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .active { display: block; }
         
-        /* SYSTÈME DE HALO DES TROPHÉES */
         .grade-card { opacity: 0.2; filter: grayscale(1); transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); border-radius: 20px; padding: 10px; border: 2px solid transparent; }
         .grade-active { opacity: 1; filter: grayscale(0); transform: scale(1.05); }
 
@@ -46,6 +45,8 @@
 
         .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, #8a6d3b, var(--gold)); width: 0%; transition: 1.5s ease-in-out; }
+        
+        .stat-dot { width: 6px; height: 6px; border-radius: 50%; margin-bottom: 4px; }
     </style>
 </head>
 <body onload="initApp()">
@@ -55,12 +56,12 @@
     <div id="sidebar">
         <p class="text-[10px] font-black text-gold uppercase tracking-[3px] mb-4 text-center">Elite Tracker</p>
         <div class="bg-white/5 rounded-2xl p-4 border border-white/5 mb-6 text-center">
-            <p class="text-[9px] text-slate-500 font-bold uppercase mb-1 text-center italic">Série de rigueur</p>
+            <p class="text-[9px] text-slate-500 font-bold uppercase mb-1">Série DCA</p>
             <p class="text-3xl font-black text-white"><span id="streak-val">0</span> <small class="text-xs text-gold">MOIS</small></p>
         </div>
-        <textarea id="vault-input" oninput="saveVault()" class="w-full h-48 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none mb-6" placeholder="Notes..."></textarea>
-        <button onclick="exportData()" class="w-full p-4 bg-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 border border-white/5 mb-2 italic">Copier JSON</button>
-        <button onclick="hardReset()" class="w-full p-4 bg-red-900/10 rounded-xl text-[10px] font-black uppercase text-red-500/70 italic">Reset Global</button>
+        <textarea id="vault-input" oninput="saveVault()" class="w-full h-48 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none mb-6" placeholder="Notes stratégiques..."></textarea>
+        <button onclick="exportData()" class="w-full p-4 bg-white/5 rounded-xl text-[10px] font-black uppercase text-slate-400 border border-white/5 mb-2">Export JSON</button>
+        <button onclick="hardReset()" class="w-full p-4 bg-red-900/10 rounded-xl text-[10px] font-black uppercase text-red-500/70">Reset Global</button>
     </div>
 
     <div id="lock-screen" class="fixed inset-0 bg-[#010409] z-[5000] flex flex-col items-center justify-center">
@@ -73,7 +74,7 @@
             <button onclick="toggleSidebar()" class="text-gold p-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg></button>
             <div class="text-center">
                 <p id="alert-msg" class="text-[8px] font-black text-gold animate-pulse mb-1 hidden uppercase tracking-widest">Alerte : DCA Insuffisant</p>
-                <span class="text-[11px] font-black text-white uppercase tracking-widest italic">Elite Wealth V5.1.2</span>
+                <span class="text-[11px] font-black text-white uppercase tracking-widest italic">Elite Wealth V5.1.5</span>
             </div>
             <img src="1773692905742.png" class="w-10 h-10 rounded-xl border border-gold/30">
         </header>
@@ -87,7 +88,7 @@
 
         <div id="main" class="page active">
             <div class="glass-card mb-6">
-                <p class="text-[9px] font-black text-gold/50 uppercase text-center mb-6 tracking-[2px]">Statut de Prestige</p>
+                <p class="text-[9px] font-black text-gold/50 uppercase text-center mb-6 tracking-[2px]">Grades de Rigueur</p>
                 <div class="grid grid-cols-3 gap-4">
                     <div id="g-1" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/6213/6213125.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">CUIVRE</p></div>
                     <div id="g-3" class="grade-card"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583344.png" class="w-10 mx-auto mb-1"><p class="text-[8px] font-black">BRONZE</p></div>
@@ -98,7 +99,7 @@
             <div class="glass-card">
                 <div class="flex items-end gap-4 mb-8">
                     <div class="w-full">
-                        <p class="text-[9px] font-black text-slate-500 uppercase mb-1 ml-1 tracking-widest">Injection DCA</p>
+                        <p class="text-[9px] font-black text-slate-500 uppercase mb-1 ml-1 tracking-widest">Montant DCA</p>
                         <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black w-full tracking-tighter bg-transparent outline-none">
                     </div>
                     <button onclick="saveToHistory()" class="bg-gold w-16 h-16 rounded-2xl flex items-center justify-center mb-1 active:scale-90 transition-all shadow-lg shadow-gold/20"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><path d="M5 13l4 4L19 7" stroke-linecap="round"/></svg></button>
@@ -109,24 +110,69 @@
 
         <div id="fire" class="page">
             <div class="glass-card text-center relative">
-                <p class="text-[10px] font-black text-gold uppercase mb-6 tracking-[2px]">Objectif Liberté</p>
+                <button onclick="setNewGoal()" class="absolute right-4 top-4 text-slate-600 hover:text-gold transition-colors">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </button>
+
+                <p class="text-[10px] font-black text-gold uppercase mb-6 tracking-[2px]">Liberté Financière</p>
                 <div class="mb-8">
                     <div class="flex justify-between items-end mb-1 text-[9px] font-black">
                         <span class="text-slate-500 uppercase">Progression Cible</span>
                         <span class="text-gold" id="goal-percent">0%</span>
                     </div>
                     <div class="progress-container"><div id="goal-bar" class="progress-bar"></div></div>
-                    <p class="text-[8px] text-slate-500 font-bold uppercase mt-1">Target : 500 € / mois</p>
+                    <p class="text-[8px] text-slate-500 font-bold uppercase mt-1 italic">Objectif : <span id="goal-label">500</span> € / mois</p>
                 </div>
                 <div class="text-5xl font-black text-white mb-2" id="rente-val">0 €</div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase mb-10 tracking-widest italic">Rente Mensuelle Passive</p>
+                <p class="text-[10px] font-bold text-slate-500 uppercase mb-10 tracking-widest italic">Rente mensuelle estimée</p>
                 <div id="forecast-list" class="space-y-4 text-left border-t border-white/5 pt-6"></div>
             </div>
         </div>
 
         <div id="stats" class="page">
-            <div class="glass-card"><div class="h-44 mb-6"><canvas id="allocChart"></canvas></div></div>
-            <div class="glass-card"><div class="h-44 mb-6"><canvas id="geoChart"></canvas></div></div>
+            <div class="glass-card mb-6">
+                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest">Allocation Actifs</p>
+                <div class="h-48 mb-8"><canvas id="allocChart"></canvas></div>
+                <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
+                    <div>
+                        <div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">PEA</span>
+                        <span class="text-[11px] font-black text-white" id="p-pea">85%</span>
+                    </div>
+                    <div>
+                        <div class="stat-dot bg-[#10b981] shadow-[0_0_8px_#10b981] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">CRYPTO</span>
+                        <span class="text-[11px] font-black text-white" id="p-crypto">11%</span>
+                    </div>
+                    <div>
+                        <div class="stat-dot bg-[#f59e0b] shadow-[0_0_8px_#f59e0b] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">CTO</span>
+                        <span class="text-[11px] font-black text-white" id="p-cto">4%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <p class="text-center text-[10px] font-black text-gold uppercase mb-6 tracking-widest">Zones Géographiques</p>
+                <div class="h-48 mb-8"><canvas id="geoChart"></canvas></div>
+                <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-6 text-center">
+                    <div>
+                        <div class="stat-dot bg-[#ef4444] shadow-[0_0_8px_#ef4444] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">USA</span>
+                        <span class="text-[11px] font-black text-white" id="p-usa">70%</span>
+                    </div>
+                    <div>
+                        <div class="stat-dot bg-[#D4AF37] shadow-[0_0_8px_#D4AF37] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">EURO</span>
+                        <span class="text-[11px] font-black text-white" id="p-euro">20%</span>
+                    </div>
+                    <div>
+                        <div class="stat-dot bg-[#6366f1] shadow-[0_0_8px_#6366f1] mx-auto"></div>
+                        <span class="text-[8px] font-black text-slate-500 uppercase mb-1 block">EM</span>
+                        <span class="text-[11px] font-black text-white" id="p-em">10%</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="market" class="page">
@@ -141,7 +187,7 @@
 
     <script>
         const PIN_SECRET = "1104"; 
-        const GOAL_RENTE = 500; 
+        let currentGoalRente = localStorage.getItem('invest_goal') || 500;
         const baseData = { World: 192, Coface: 30, Immo: 27, EM: 22, Def: 12, SP500: 12, Crypto: 35 };
         let charts = {};
 
@@ -162,6 +208,15 @@
             const o = document.getElementById('overlay');
             s.classList.toggle('open');
             o.style.display = s.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function setNewGoal() {
+            const newGoal = prompt("Définir ta cible de rente mensuelle (€) :", currentGoalRente);
+            if(newGoal && !isNaN(newGoal)) {
+                currentGoalRente = parseInt(newGoal);
+                localStorage.setItem('invest_goal', currentGoalRente);
+                updateAll();
+            }
         }
 
         function calculateDCA() {
@@ -190,20 +245,19 @@
             const streak = history.length;
             
             const monthlyIncome = (totalCapital * 0.04) / 12;
-            const progress = Math.min((monthlyIncome / GOAL_RENTE) * 100, 100);
+            const progress = Math.min((monthlyIncome / currentGoalRente) * 100, 100);
 
             document.getElementById('rente-val').innerText = monthlyIncome.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + " €";
             document.getElementById('goal-percent').innerText = progress.toFixed(1) + "%";
             document.getElementById('goal-bar').style.width = progress + "%";
+            document.getElementById('goal-label').innerText = currentGoalRente;
             document.getElementById('streak-val').innerText = streak;
 
-            // LOGIQUE DE HALO PRESTIGE
             const g1 = document.getElementById('g-1'), g3 = document.getElementById('g-3'), g6 = document.getElementById('g-6');
             [g1, g3, g6].forEach(g => g.className = "grade-card");
-
-            if(streak >= 1) { g1.classList.add('grade-active', 'copper-glow'); }
-            if(streak >= 3) { g3.classList.add('grade-active', 'bronze-glow'); }
-            if(streak >= 6) { g6.classList.add('grade-active', 'silver-glow'); }
+            if(streak >= 1) g1.classList.add('grade-active', 'copper-glow');
+            if(streak >= 3) g3.classList.add('grade-active', 'bronze-glow');
+            if(streak >= 6) g6.classList.add('grade-active', 'silver-glow');
 
             const dca = parseFloat(document.getElementById('dcaInput').value) || 330;
             document.getElementById('forecast-list').innerHTML = [10, 20, 35].map(y => {
@@ -212,7 +266,7 @@
                 const r = (cap * 0.04)/12;
                 return `<div class="border-l-2 border-gold/40 pl-4 py-1 flex justify-between items-center">
                     <div><p class="text-[8px] text-gold font-black uppercase tracking-widest">Horizon ${y} ans</p><p class="text-xl font-black">${cap.toLocaleString('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0})}</p></div>
-                    <div class="text-right"><p class="text-[7px] text-slate-500 font-bold uppercase">Rente/mois</p><p class="text-sm font-black ${r >= GOAL_RENTE ? 'text-green-400' : 'text-gold/80'}">${r.toLocaleString('fr-FR',{maximumFractionDigits:0})}€</p></div>
+                    <div class="text-right"><p class="text-[7px] text-slate-500 font-bold uppercase">Rente/mois</p><p class="text-sm font-black ${r >= currentGoalRente ? 'text-green-400' : 'text-gold/80'}">${r.toLocaleString('fr-FR',{maximumFractionDigits:0})}€</p></div>
                 </div>`;
             }).join('');
             renderCharts();
@@ -247,7 +301,7 @@
             history.push({ amount: val });
             localStorage.setItem('invest_history', JSON.stringify(history));
             updateAll();
-            alert("Injection Validée.");
+            alert("Enregistré avec succès.");
         }
 
         function showPage(id, btn) {
@@ -260,8 +314,8 @@
         }
 
         function saveVault() { localStorage.setItem('invest_vault', document.getElementById('vault-input').value); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Copié !"); }
-        function hardReset() { if(confirm("Réinitialiser ?")) { localStorage.clear(); location.reload(); } }
+        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("JSON copié !"); }
+        function hardReset() { if(confirm("Effacer toutes les données ?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>
