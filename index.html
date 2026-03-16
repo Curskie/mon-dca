@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.4.0 - Pixel Elite</title>
+    <title>Invest Pilot V5.4.1 - Pixel Elite Fix</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
@@ -16,48 +16,31 @@
         :root { --gold: #D4AF37; --bg: #000000; --card: #0a0a0a; }
         body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
-        /* OLED Deep Black */
         .glass-card { 
             background: var(--card);
             border: 1px solid #1a1a1a;
             border-radius: 20px; padding: 20px; margin-bottom: 16px;
         }
 
-        .nav-btn { font-size: 10px; font-weight: 800; color: #404040; flex: 1; text-align: center; padding: 20px 0; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 1px; }
+        /* Navigation Complète Restaurée */
+        .nav-container { display: flex; border-b: 1px solid #111; background: #000; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #404040; padding: 18px 25px; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
         .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
 
         .page { display: none; padding: 16px; padding-bottom: 100px; animation: fadeIn 0.2s ease-out; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .market-select, .surplus-select {
-            background: #111;
-            border: 1px solid #222;
-            color: var(--gold);
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 12px;
-            font-weight: 800;
-            width: 100%;
-            outline: none;
-            appearance: none;
-            text-transform: uppercase;
+        .market-select {
+            background: #111; border: 1px solid #222; color: var(--gold); border-radius: 12px;
+            padding: 14px; font-size: 12px; font-weight: 800; width: 100%; outline: none; text-transform: uppercase;
         }
 
-        .copy-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 900;
-        }
-        .copy-btn:active { background: var(--gold); color: #000; }
-
+        .copy-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 11px; font-weight: 900; }
+        
         /* Ghost Mode Logic */
-        .ghost-hidden { filter: blur(12px) grayscale(1); pointer-events: none; transition: 0.3s; }
-        .ghost-text { filter: blur(6px); user-select: none; }
+        .ghost-hidden { filter: blur(15px) grayscale(1); pointer-events: none; }
+        .ghost-text { filter: blur(8px); user-select: none; }
 
         #lock-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .pin-dot { height: 12px; width: 12px; border: 2px solid var(--gold); border-radius: 50%; margin: 0 8px; transition: 0.2s; }
@@ -75,18 +58,20 @@
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="p-6 pt-12 flex justify-between items-center bg-black sticky top-0 z-50 border-b border-[#111]">
-            <div class="w-10"></div>
-            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth</div>
-            <button onclick="toggleGhost()" id="ghostBtn" class="w-10 h-10 rounded-xl border border-[#222] flex items-center justify-center text-xl transition-all active:scale-90">
+        <header class="p-6 pt-12 flex justify-between items-center bg-black border-b border-[#111]">
+            <div class="w-10 text-xl" onclick="location.reload()">🔄</div>
+            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth V5.4.1</div>
+            <button onclick="toggleGhost()" id="ghostBtn" class="w-10 h-10 rounded-xl border border-[#222] flex items-center justify-center text-xl transition-all">
                 👻
             </button>
         </header>
 
-        <nav class="flex bg-black sticky top-[95px] z-50 border-b border-[#111]">
-            <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA Plan</button>
-            <button onclick="showPage('market', this)" class="nav-btn">Live Market</button>
-        </nav>
+        <div class="nav-container sticky top-0 z-50">
+            <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
+            <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
+            <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
+            <button onclick="showPage('market', this)" class="nav-btn">LIVE</button>
+        </div>
 
         <div id="main" class="page active">
             <div class="glass-card">
@@ -99,36 +84,60 @@
                     <span class="text-[8px] font-black text-gold uppercase tracking-widest">Mode Surplus</span>
                     <input type="checkbox" id="surplusToggle" onchange="calculateDCA()" class="w-6 h-6 rounded-full accent-gold">
                 </div>
-                
                 <div id="surplus-controls" class="space-y-4 opacity-20 pointer-events-none transition-all">
                     <input type="number" id="surplusAmount" value="50" oninput="calculateDCA()" class="text-3xl font-black bg-transparent border-b border-zinc-800 outline-none text-white w-full pb-2 amount-display">
                     <select id="surplusTarget" onchange="calculateDCA()" class="surplus-select">
-                        <option value="STRAT">Pilier (80% WPEA / 20% BTC)</option>
+                        <option value="STRAT">Pilier (80/20)</option>
                         <option value="WPEA">100% MSCI World</option>
                         <option value="BTC">100% Bitcoin</option>
                     </select>
                 </div>
             </div>
-
             <div id="calculation-list" class="space-y-3 pb-10"></div>
         </div>
 
-        <div id="market" class="page">
-            <div id="price-ticker-container" class="h-16 rounded-2xl border border-[#111] overflow-hidden mb-4 bg-[#050505]">
-                <div id="tv-ticker-widget"></div>
+        <div id="stats" class="page">
+            <div class="glass-card flex flex-col items-center justify-center min-h-[300px]">
+                <div class="w-48 h-48 rounded-full border-8 border-gold/20 flex items-center justify-center relative">
+                    <div class="absolute inset-0 border-t-8 border-gold rounded-full rotate-45"></div>
+                    <span class="text-2xl font-black">74% Equity</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-8 w-full">
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                        <span class="text-[8px] text-zinc-500 uppercase block">Performance</span>
+                        <span class="text-green-500 font-bold">+12.4%</span>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5">
+                        <span class="text-[8px] text-zinc-500 uppercase block">Dividendes</span>
+                        <span class="text-white font-bold">2.1%</span>
+                    </div>
+                </div>
             </div>
-            <select id="assetSelector" onchange="updateMarketView(this.value)" class="market-select mb-4">
-                <option value="EURONEXT:WPEA">MSCI World (WPEA)</option>
-                <option value="EURONEXT:ESE">S&P 500 (ESE)</option>
-                <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
-                <option value="EURONEXT:COFA">Coface (COFA)</option>
-            </select>
-            <div id="tv_player" class="glass-card h-[460px] p-0 overflow-hidden border-[#222]"></div>
+        </div>
+
+        <div id="market" class="page">
+            <div class="mb-4">
+                <select id="assetSelector" onchange="updateMarketView(this.value)" class="market-select">
+                    <option value="EURONEXT:WPEA">MSCI World (WPEA)</option>
+                    <option value="EURONEXT:ESE">S&P 500 (ESE)</option>
+                    <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+                    <option value="EURONEXT:COFA">Coface (COFA)</option>
+                    <option value="EURONEXT:PAEEM">Emerging (PAEEM)</option>
+                </select>
+            </div>
+            <div id="tv_player" class="glass-card h-[500px] p-0 overflow-hidden border-[#222]"></div>
+        </div>
+        
+        <div id="fire" class="page">
+            <div class="glass-card">
+                <span class="text-gold font-black uppercase text-xs">Objectif Indépendance</span>
+                <p class="text-zinc-500 text-sm mt-2 italic text-center">Calculateur FIRE en cours de synchronisation...</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- MODIFIER LE PIN ICI ---
+        // LIGNE PIN :
         const PIN_SECRET = "1104"; 
 
         const BASE_PLAN = { WPEA: 192, COFA: 30, PMEH: 27, PAEEM: 22, ASAM: 12, ESE: 12, Crypto: 35 };
@@ -137,36 +146,24 @@
         function initApp() {
             const input = document.getElementById('pinInput');
             const dots = document.querySelectorAll('.pin-dot');
-            
             input.addEventListener('input', (e) => {
                 const val = e.target.value;
                 dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
-                
                 if(val === PIN_SECRET) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
                     calculateDCA();
                 } else if (val.length >= 4) {
-                    setTimeout(() => {
-                        e.target.value = '';
-                        dots.forEach(dot => dot.classList.remove('filled'));
-                    }, 200);
+                    setTimeout(() => { e.target.value = ''; dots.forEach(dot => dot.classList.remove('filled')); }, 200);
                 }
             });
         }
 
         function toggleGhost() {
             isGhost = !isGhost;
-            const btn = document.getElementById('ghostBtn');
-            btn.style.borderColor = isGhost ? 'var(--gold)' : '#222';
-            btn.style.background = isGhost ? 'rgba(212,175,55,0.1)' : 'transparent';
-            
-            document.querySelectorAll('.amount-display').forEach(el => {
-                el.classList.toggle('ghost-text', isGhost);
-            });
-            
-            document.getElementById('tv_player').classList.toggle('ghost-hidden', isGhost);
+            document.getElementById('ghostBtn').style.background = isGhost ? 'rgba(212,175,55,0.1)' : 'transparent';
             calculateDCA();
+            document.getElementById('tv_player').classList.toggle('ghost-hidden', isGhost);
         }
 
         function calculateDCA() {
@@ -185,10 +182,8 @@
             Object.keys(BASE_PLAN).forEach(k => res[k] = BASE_PLAN[k] * ratio);
 
             if(useSurplus && surplusVal > 0) {
-                if(target === "STRAT") { 
-                    res['WPEA'] += surplusVal * 0.8; 
-                    res['Crypto'] += surplusVal * 0.2; 
-                } else if (target === "WPEA") { res['WPEA'] += surplusVal; }
+                if(target === "STRAT") { res['WPEA'] += surplusVal * 0.8; res['Crypto'] += surplusVal * 0.2; }
+                else if (target === "WPEA") { res['WPEA'] += surplusVal; }
                 else if (target === "BTC") { res['Crypto'] += surplusVal; }
             }
 
@@ -196,11 +191,10 @@
                 const val = res[k].toFixed(2);
                 const isPrio = (useSurplus && ((target === "STRAT" && (k === 'WPEA' || k === 'Crypto')) || (target === k) || (target === 'BTC' && k === 'Crypto')));
                 const displayVal = isGhost ? "**.**" : val;
-                
                 return `
-                <div class="flex justify-between items-center p-5 bg-[#0a0a0a] rounded-2xl border ${isPrio ? 'border-gold/30 bg-gold/[0.02]' : 'border-[#1a1a1a]'}">
+                <div class="flex justify-between items-center p-5 bg-[#0a0a0a] rounded-2xl border ${isPrio ? 'border-gold/30' : 'border-[#1a1a1a]'}">
                     <div>
-                        <span class="text-[9px] font-black text-zinc-500 uppercase tracking-tighter">${k}</span>
+                        <span class="text-[9px] font-black text-zinc-500 uppercase">${k}</span>
                         <div class="text-2xl font-black text-white ${isGhost ? 'ghost-text' : ''}">${displayVal}€</div>
                     </div>
                     <button onclick="copyToClipboard('${val}')" class="copy-btn">COPIER</button>
@@ -208,21 +202,13 @@
             }).join('');
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-        }
+        function copyToClipboard(text) { navigator.clipboard.writeText(text); }
 
         function updateMarketView(symbol) {
-            document.getElementById('tv-ticker-widget').innerHTML = "";
-            const script = document.createElement('script');
-            script.src = "https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js";
-            script.async = true;
-            script.innerHTML = JSON.stringify({ "symbol": symbol, "width": "100%", "colorTheme": "dark", "isTransparent": true, "locale": "fr" });
-            document.getElementById('tv-ticker-widget').appendChild(script);
-
             document.getElementById('tv_player').innerHTML = "";
             new TradingView.widget({
-                "width": "100%", "height": 460, "symbol": symbol, "interval": "D", "theme": "dark", "style": "3", "locale": "fr", "container_id": "tv_player", "backgroundColor": "#000000", "gridColor": "#111", "hide_top_toolbar": true
+                "width": "100%", "height": 500, "symbol": symbol, "interval": "D", "theme": "dark", "style": "1", "locale": "fr",
+                "container_id": "tv_player", "backgroundColor": "#000000", "gridColor": "#111", "hide_top_toolbar": false, "hide_legend": false, "save_image": false
             });
         }
 
