@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V3.11 - Fix Login</title>
+    <title>Invest Pilot V3.15 - Market Edition</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --blue: #3b82f6; --slate-950: #020617; }
-        body { background: var(--slate-950); -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; color: #f8fafc; font-family: ui-sans-serif, system-ui; }
-        
-        .page { display: none; min-height: 100vh; padding: 20px; padding-bottom: 160px; }
+        body { background: var(--slate-950); color: #f8fafc; font-family: ui-sans-serif, system-ui; margin: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .page { display: none; min-height: 100vh; padding: 20px; padding-bottom: 140px; }
         .active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        
         #sidebar { position: fixed; left: -320px; top: 0; width: 300px; height: 100%; background: #070e1d; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(255,255,255,0.05); overflow-y: auto; }
         #sidebar.open { left: 0; box-shadow: 25px 0 80px rgba(0,0,0,0.9); }
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2500; display: none; backdrop-filter: blur(8px); }
         
         .card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 16px; }
-        .nav-btn { font-size: 11px; font-weight: 800; color: #64748b; padding: 14px 0; border-bottom: 2px solid transparent; }
+        .nav-btn { font-size: 9px; font-weight: 800; color: #64748b; padding: 14px 0; border-bottom: 2px solid transparent; flex: 1; text-align: center; }
         .nav-active { color: #3b82f6; border-bottom-color: #3b82f6; }
         
-        /* PIN FIX */
-        #pinInput { background: transparent; color: transparent; border: none; outline: none; position: absolute; width: 100%; height: 100%; top: 0; left: 0; font-size: 16px; caret-color: transparent; }
+        #pinInput { background: transparent; color: transparent; border: none; outline: none; position: absolute; width: 100%; height: 100%; top: 0; left: 0; font-size: 16px; }
         .badge { filter: grayscale(1) opacity(0.1); transition: 0.6s; }
-        .badge.unlocked { filter: grayscale(0) opacity(1); }
+        .badge.unlocked { filter: grayscale(0) opacity(1); transform: scale(1.05); }
         .badge-card { background: rgba(255,255,255,0.02); border-radius: 20px; padding: 14px 4px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+        
+        /* Widget Market */
+        .tradingview-widget-container { border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); height: 500px; }
         .ghost-mode .blur-val { filter: blur(15px); pointer-events: none; }
     </style>
 </head>
@@ -36,8 +37,7 @@
     <div id="overlay" onclick="toggleSidebar()"></div>
     
     <div id="sidebar">
-        <h2 class="text-blue-500 font-black text-[10px] uppercase tracking-[0.3em] mb-6 italic text-center">Niveau de Prestige</h2>
-        <p class="text-[9px] text-slate-500 font-bold uppercase mb-4 tracking-widest text-center">Grades d'Investisseur</p>
+        <h2 class="text-blue-500 font-black text-[10px] uppercase tracking-[0.3em] mb-6 italic text-center">Progression</h2>
         <div class="grid grid-cols-3 gap-2.5 mb-8">
             <div class="badge-card badge" id="badge-300"><div class="text-2xl mb-1">🧱</div><div class="text-[7px] font-black uppercase text-orange-700">Cuivre</div></div>
             <div class="badge-card badge" id="badge-500"><div class="text-2xl mb-1">🥉</div><div class="text-[7px] font-black uppercase text-orange-400">Bronze</div></div>
@@ -46,26 +46,34 @@
             <div class="badge-card badge" id="badge-5000"><div class="text-2xl mb-1">🥇</div><div class="text-[7px] font-black uppercase text-yellow-500">Or</div></div>
             <div class="badge-card badge" id="badge-10000"><div class="text-2xl mb-1">💎</div><div class="text-[7px] font-black uppercase text-cyan-400">Platine</div></div>
         </div>
-        <div class="space-y-6">
+
+        <div class="mb-8">
+            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-4 ml-2 italic">Ressources</p>
+            <div class="space-y-2">
+                <a href="https://www.boursorama.com" target="_blank" class="block bg-white/5 p-3 rounded-xl text-[10px] font-bold uppercase tracking-tighter">🏦 Boursorama</a>
+                <a href="https://www.zonebourse.com" target="_blank" class="block bg-white/5 p-3 rounded-xl text-[10px] font-bold uppercase tracking-tighter">📈 Zone Bourse</a>
+            </div>
+        </div>
+
+        <div class="space-y-4">
             <div class="p-5 bg-blue-600/5 border border-blue-500/20 rounded-3xl text-center">
-                <p class="text-[9px] text-blue-400 font-bold uppercase mb-1 italic">Série de DCA</p>
+                <p class="text-[9px] text-blue-400 font-bold uppercase mb-1 italic">Série DCA</p>
                 <p class="text-3xl font-black"><span id="streak-count">0</span> <small class="text-xs font-normal opacity-50 uppercase">Mois</small></p>
             </div>
-            <textarea id="convictionNote" rows="5" class="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-[11px] text-slate-300 outline-none" oninput="saveNote()"></textarea>
-            <button onclick="exportData()" class="w-full p-4 bg-slate-900 rounded-2xl text-[9px] font-black uppercase border border-white/5">Export JSON</button>
+            <button onclick="exportData()" class="w-full p-4 bg-slate-900 rounded-2xl text-[9px] font-black uppercase border border-white/5">💾 Export JSON</button>
+            <button onclick="localStorage.clear(); location.reload();" class="w-full p-2 text-[8px] font-black uppercase text-red-900/30">Reset App</button>
         </div>
     </div>
 
-    <div id="lock-screen" class="fixed inset-0 bg-[#020617] z-[5000] flex flex-col items-center justify-center p-6 text-center">
+    <div id="lock-screen" class="fixed inset-0 bg-[#020617] z-[5000] flex flex-col items-center justify-center p-6">
         <img src="1773669549907.png" class="w-20 h-20 rounded-3xl mb-12 border border-white/10 shadow-2xl">
         <div class="relative w-64 h-16 flex justify-center items-center gap-6 mb-8" onclick="document.getElementById('pinInput').focus()">
-            <input type="number" id="pinInput" pattern="[0-9]*" inputmode="numeric" maxlength="4">
+            <input type="number" id="pinInput" pattern="[0-9]*" inputmode="numeric">
             <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-700 transition-all"></div>
             <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-700 transition-all"></div>
             <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-700 transition-all"></div>
             <div class="pin-dot w-4 h-4 rounded-full border-2 border-slate-700 transition-all"></div>
         </div>
-        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Appuyez pour saisir le code</p>
     </div>
 
     <div id="app-content" style="display:none">
@@ -73,14 +81,15 @@
             <button onclick="toggleSidebar()" class="p-2 -ml-2 text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8h16M4 16h16" /></svg></button>
             <div class="flex items-center gap-4">
                 <button onclick="toggleGhost()" class="w-10 h-10 flex items-center justify-center bg-slate-900 rounded-2xl border border-white/5">👁️</button>
-                <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-white/10 shadow-xl">
+                <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-white/10">
             </div>
         </header>
 
-        <nav class="sticky top-[104px] z-[1000] flex justify-around bg-[#020617] border-b border-white/5 px-4">
-            <button onclick="showPage('main', this)" class="nav-btn nav-active w-full uppercase">Tactique</button>
-            <button onclick="showPage('freedom', this)" class="nav-btn w-full uppercase">FIRE</button>
-            <button onclick="showPage('history', this)" class="nav-btn w-full uppercase">Stats</button>
+        <nav class="sticky top-[104px] z-[1000] flex justify-between bg-[#020617] border-b border-white/5 px-2">
+            <button onclick="showPage('main', this)" class="nav-btn nav-active uppercase">Tactique</button>
+            <button onclick="showPage('freedom', this)" class="nav-btn uppercase">Fire</button>
+            <button onclick="showPage('history', this)" class="nav-btn uppercase">Stats</button>
+            <button onclick="showPage('market', this)" class="nav-btn uppercase italic text-blue-400">Marché</button>
         </nav>
 
         <div id="main" class="page active">
@@ -88,10 +97,10 @@
                 <p class="text-[10px] font-black text-blue-500 uppercase mb-5 italic" id="current-date"></p>
                 <div class="flex gap-4 mb-8 items-end">
                     <div class="flex-1">
-                        <p class="text-[9px] text-slate-500 font-bold uppercase mb-1 ml-1 tracking-widest">Injection</p>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase mb-1 tracking-widest">Injection</p>
                         <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="w-full bg-transparent text-6xl font-black outline-none tracking-tighter">
                     </div>
-                    <button onclick="saveToHistory()" class="bg-blue-600 w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90 shadow-lg shadow-blue-600/20">
+                    <button onclick="saveToHistory()" class="bg-blue-600 w-14 h-14 rounded-2xl flex items-center justify-center active:scale-90">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                     </button>
                 </div>
@@ -100,13 +109,13 @@
         </div>
 
         <div id="freedom" class="page">
-            <div class="card text-center py-10 relative">
-                <p class="text-[10px] font-black text-slate-500 uppercase mb-4">Revenu Passif Mensuel</p>
+            <div class="card text-center py-10">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-[0.2em]">Rente / Objectif (1500€)</p>
                 <div class="text-7xl font-black mb-10 blur-val tracking-tighter" id="rente-val">0 €</div>
                 <div class="space-y-6 text-left px-2">
-                    <div id="step-1" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>☕ Abonnements (50€)</span><span id="rem-50" class="font-mono">50€</span></div>
-                    <div id="step-2" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>🛒 Courses (250€)</span><span id="rem-250" class="font-mono">250€</span></div>
-                    <div id="step-3" class="flex justify-between items-center text-[11px] font-bold text-slate-600 uppercase"><span>🏠 Loyer (800€)</span><span id="rem-800" class="font-mono">800€</span></div>
+                    <div id="step-1" class="flex justify-between items-center text-[11px] font-black text-slate-500 uppercase"><span>☕ Abonnements (50€)</span><span id="rem-50" class="font-mono text-blue-500">50€</span></div>
+                    <div id="step-2" class="flex justify-between items-center text-[11px] font-black text-slate-500 uppercase"><span>🛒 Courses (250€)</span><span id="rem-250" class="font-mono text-blue-500">250€</span></div>
+                    <div id="step-3" class="flex justify-between items-center text-[11px] font-black text-slate-500 uppercase"><span>🏠 Loyer (800€)</span><span id="rem-800" class="font-mono text-blue-500">800€</span></div>
                     <div class="h-2 bg-slate-950 rounded-full mt-4 overflow-hidden border border-white/5">
                         <div id="freedom-progress" class="h-full bg-gradient-to-r from-blue-600 to-emerald-400 transition-all duration-1000 w-0"></div>
                     </div>
@@ -115,15 +124,45 @@
         </div>
 
         <div id="history" class="page">
-            <div class="card m-0 flex flex-col items-center">
-                <div class="w-full h-52 relative mb-6"><canvas id="allocationChart"></canvas></div>
-                <div class="grid grid-cols-3 w-full gap-2 text-[9px] font-black text-slate-400 text-center uppercase">
-                    <div class="p-3 bg-white/5 rounded-2xl">PEA <br><span class="text-blue-500">85%</span></div>
-                    <div class="p-3 bg-white/5 rounded-2xl">CRYPTO <br><span class="text-emerald-500">11%</span></div>
-                    <div class="p-3 bg-white/5 rounded-2xl">CTO <br><span class="text-orange-500">4%</span></div>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="card m-0">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 text-center italic">Actifs & Géo</p>
+                    <div class="h-44 relative mb-10"><canvas id="allocationChart"></canvas></div>
+                    <div class="h-44 relative mb-6"><canvas id="geoChart"></canvas></div>
                 </div>
+                <div id="history-list" class="space-y-2 mt-2"></div>
             </div>
-            <div id="history-list" class="space-y-2 blur-val mt-4"></div>
+        </div>
+
+        <div id="market" class="page">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                {
+                  "colorTheme": "dark",
+                  "dateRange": "12M",
+                  "showChart": true,
+                  "locale": "fr",
+                  "width": "100%",
+                  "height": "100%",
+                  "largeChartUrl": "",
+                  "isTransparent": true,
+                  "showSymbolLogo": true,
+                  "showFloatingTooltip": false,
+                  "tabs": [
+                    {
+                      "title": "Indices",
+                      "symbols": [
+                        { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
+                        { "s": "INDEX:CAC40", "d": "CAC 40" },
+                        { "s": "INDEX:SX5E", "d": "Euro Stoxx 50" },
+                        { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" }
+                      ]
+                    }
+                  ]
+                }
+                </script>
+            </div>
         </div>
     </div>
 
@@ -134,26 +173,13 @@
 
         function initApp() {
             const input = document.getElementById('pinInput');
-            const dots = document.querySelectorAll('.pin-dot');
-            
             input.addEventListener('input', (e) => {
-                const val = e.target.value;
-                if(val.length > 4) e.target.value = val.slice(0,4);
-                
-                dots.forEach((dot, i) => {
-                    if(i < val.length) { dot.style.background = '#3b82f6'; dot.style.borderColor = '#3b82f6'; }
-                    else { dot.style.background = 'transparent'; dot.style.borderColor = '#1e293b'; }
-                });
-
-                if(val === PIN_CODE) {
+                if(e.target.value === PIN_CODE) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
                     updateAll();
-                } else if(val.length === 4) {
-                    setTimeout(() => { e.target.value = ''; dots.forEach(d => { d.style.background = 'transparent'; d.style.borderColor = '#1e293b'; }); }, 200);
                 }
             });
-            
             calculateDCA();
             document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
         }
@@ -181,18 +207,13 @@
             const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
             const total = history.reduce((sum, item) => sum + item.amount, 0);
             const rente = (total * 0.04) / 12;
-            
             document.getElementById('rente-val').innerText = rente.toFixed(2) + " €";
             
             updateStep(1, rente, 50, 'rem-50');
             updateStep(2, rente, 250, 'rem-250');
             updateStep(3, rente, 800, 'rem-800');
             
-            const ranks = [
-                {id: 'badge-300', val: 300}, {id: 'badge-500', val: 500},
-                {id: 'badge-750', val: 750}, {id: 'badge-1000', val: 1000},
-                {id: 'badge-5000', val: 5000}, {id: 'badge-10000', val: 10000}
-            ];
+            const ranks = [{id: 'badge-300', val: 300}, {id: 'badge-500', val: 500}, {id: 'badge-750', val: 750}, {id: 'badge-1000', val: 1000}, {id: 'badge-5000', val: 5000}, {id: 'badge-10000', val: 10000}];
             ranks.forEach(r => {
                 const el = document.getElementById(r.id);
                 if(total >= r.val) el.classList.add('unlocked');
@@ -201,8 +222,6 @@
 
             document.getElementById('freedom-progress').style.width = Math.min((rente / 1500) * 100, 100) + "%";
             document.getElementById('streak-count').innerText = history.length;
-            document.getElementById('convictionNote').value = localStorage.getItem('user_note') || "";
-
             renderCharts();
 
             document.getElementById('history-list').innerHTML = history.slice().reverse().map(item => `
@@ -220,13 +239,19 @@
         }
 
         function renderCharts() {
-            const ctx = document.getElementById('allocationChart');
-            if(!ctx) return;
-            if(charts['alloc']) charts['alloc'].destroy();
-            charts['alloc'] = new Chart(ctx, {
-                type: 'doughnut',
-                data: { datasets: [{ data: [85, 11, 4], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'], borderWidth: 0 }] },
-                options: { cutout: '85%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            const cfgs = [
+                { id: 'allocationChart', data: [85, 11, 4], colors: ['#3b82f6', '#10b981', '#f59e0b'] },
+                { id: 'geoChart', data: [70, 20, 10], colors: ['#ef4444', '#3b82f6', '#6366f1'] }
+            ];
+            cfgs.forEach(cfg => {
+                const ctx = document.getElementById(cfg.id);
+                if(!ctx) return;
+                if(charts[cfg.id]) charts[cfg.id].destroy();
+                charts[cfg.id] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { datasets: [{ data: cfg.data, backgroundColor: cfg.colors, borderWidth: 0 }] },
+                    options: { cutout: '82%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
             });
         }
 
@@ -245,11 +270,11 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
             if(id === 'history') setTimeout(renderCharts, 150);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function toggleGhost() { document.body.classList.toggle('ghost-mode'); }
-        function saveNote() { localStorage.setItem('user_note', document.getElementById('convictionNote').value); }
-        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("Backup copié !"); }
+        function exportData() { navigator.clipboard.writeText(localStorage.getItem('invest_history')); alert("JSON copié !"); }
     </script>
 </body>
 </html>
