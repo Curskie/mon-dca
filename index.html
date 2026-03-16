@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.5.6 - Custom Config</title>
+    <title>Invest Pilot V5.6.1 - Stats Swap</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
@@ -29,19 +29,20 @@
 
         .action-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
         .gold-btn { background: var(--gold); color: #000; border: none; font-weight: 900; }
+        .check-btn { background: #1a1a1a; color: #22c55e; border: 1px solid #222; border-radius: 12px; padding: 10px; transition: all 0.2s; }
+        .check-active { background: #14532d; color: #4ade80; border-color: #22c55e; }
 
         .ghost-text-active { filter: blur(12px) !important; user-select: none; }
+
+        input[type=range] { width: 100%; accent-color: var(--gold); background: #1a1a1a; height: 8px; border-radius: 5px; appearance: none; margin: 25px 0; }
+        
+        /* Stats Bars */
+        .progress-bg { height: 6px; background: #111; border-radius: 3px; width: 100%; margin: 6px 0; }
+        .progress-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width 0.5s ease; }
 
         #lock-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .pin-dot { height: 14px; width: 14px; border: 2px solid #222; border-radius: 50%; margin: 0 10px; }
         .pin-dot.filled { border-color: var(--gold); background: var(--gold); }
-
-        /* Stats Bars */
-        .progress-bg { height: 8px; background: #111; border-radius: 4px; width: 100%; margin: 8px 0; }
-        .progress-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.3s ease; }
-
-        /* Settings Panel */
-        #settings-panel { display: none; background: #050505; border: 1px solid #222; border-radius: 20px; padding: 20px; margin-top: 10px; }
     </style>
 </head>
 <body onload="initApp()">
@@ -59,7 +60,7 @@
     <div id="app-content" style="display:none">
         <header class="p-6 pt-12 flex justify-between items-center bg-black border-b border-[#111]">
             <div class="w-10 text-xl" onclick="location.reload()">🔄</div>
-            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth V5.5.6</div>
+            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth V5.6.1</div>
             <button onclick="toggleGhost()" id="ghostBtn" class="w-10 h-10 rounded-xl border border-[#222] flex items-center justify-center text-xl">👻</button>
         </header>
 
@@ -71,51 +72,78 @@
         </div>
 
         <div id="main" class="page active">
-            <div class="glass-card">
-                <span class="text-[8px] font-black text-zinc-600 uppercase mb-2 block tracking-widest">Budget Mensuel</span>
-                <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black bg-transparent outline-none text-white w-full tracking-tighter amount-target">
+            <div class="glass-card flex items-center gap-4">
+                <div class="flex-grow">
+                    <span class="text-[8px] font-black text-zinc-600 uppercase mb-2 block tracking-widest">Budget Mensuel</span>
+                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-5xl font-black bg-transparent outline-none text-white w-full tracking-tighter amount-target">
+                </div>
+                <button onclick="this.classList.toggle('check-active')" class="check-btn text-xl">✓</button>
             </div>
             <div id="calculation-list" class="space-y-3 pb-10"></div>
         </div>
 
         <div id="fire" class="page">
-            <div class="flex justify-between items-center mb-4 px-2">
-                <select id="fireMode" onchange="calculateDCA()" class="select-custom !w-[70%]">
-                    <option value="RENTE">Mode : Rente 4%</option>
-                    <option value="PROJECTION">Mode : Projections</option>
-                    <option value="ENVELOPPES">Mode : Enveloppes</option>
+            <div class="flex justify-between items-center mb-4 px-1">
+                <select id="fireMode" onchange="calculateDCA()" class="select-custom !w-[82%]">
+                    <option value="RENTE">Rente Mensuelle (4%)</option>
+                    <option value="PROJECTION">Projection Capital (7%)</option>
                 </select>
                 <button onclick="toggleSettings()" class="action-btn !py-3 !px-4">⚙️</button>
             </div>
 
-            <div id="settings-panel" class="mb-6">
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[8px] font-black text-zinc-500 uppercase block mb-1">Capital Déjà Investi (€)</label>
-                        <input type="number" id="initialCap" value="0" oninput="calculateDCA()" class="input-custom">
-                    </div>
-                    <div>
-                        <label class="text-[8px] font-black text-zinc-500 uppercase block mb-1">Rendement Annuel (%)</label>
-                        <input type="number" id="yieldRate" value="7" oninput="calculateDCA()" class="input-custom">
-                    </div>
-                </div>
+            <div id="settings-panel" style="display:none" class="mb-6 bg-[#050505] p-5 rounded-2xl border border-zinc-900 shadow-2xl">
+                <label class="text-[8px] font-black text-zinc-500 uppercase block mb-1">Capital Investi (€)</label>
+                <input type="number" id="initialCap" value="5000" oninput="calculateDCA()" class="input-custom">
             </div>
 
-            <div class="glass-card text-center min-h-[300px]">
-                <div id="fire-dynamic-content">
-                    <p class="text-[10px] font-black text-gold uppercase mb-2 tracking-[2px]">Valeur Estimée</p>
-                    <div class="text-5xl font-black text-white mb-2 amount-target" id="rente-val">0 €</div>
-                    <p id="fire-label" class="text-[8px] text-zinc-500 font-bold uppercase italic mb-6"></p>
-                    <div id="forecast-list" class="space-y-4 text-left border-t border-[#111] pt-6"></div>
-                </div>
+            <div class="glass-card text-center min-h-[350px]">
+                <p class="text-[10px] font-black text-gold uppercase mb-2 tracking-[2px]">Analyse FIRE</p>
+                <div class="text-5xl font-black text-white mb-2 amount-target" id="rente-val">0 €</div>
+                <p id="fire-label" class="text-[8px] text-zinc-500 font-bold uppercase mb-8 italic"></p>
+                <div id="forecast-list" class="space-y-4 text-left border-t border-[#111] pt-6"></div>
             </div>
         </div>
 
         <div id="stats" class="page">
-            <div class="glass-card mb-4 text-center">
-                <span class="text-[10px] font-black text-gold uppercase tracking-widest">Répartition Equité</span>
-                <input type="range" min="0" max="100" value="74" class="w-full accent-gold my-6" oninput="updateStats(this.value)">
-                <div class="text-4xl font-black text-white mb-1 amount-target" id="equityValue">74% Equity</div>
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Tableau de bord</div>
+                <button onclick="swapStatsView()" class="action-btn gold-btn !text-[9px]">SWAP VUE ⇄</button>
+            </div>
+
+            <div id="stats-view-1">
+                <div class="glass-card text-center mb-4">
+                    <span class="text-[10px] font-black text-gold uppercase tracking-widest">Répartition Equité</span>
+                    <input type="range" min="0" max="100" value="74" id="equitySlider" oninput="updateStats()">
+                    <div class="text-4xl font-black text-white amount-target" id="equityValue">74% Equity</div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card p-4 text-center">
+                        <span class="text-[8px] text-zinc-500 uppercase block mb-1">Performance</span>
+                        <span class="text-lg font-black text-green-500">+12.4%</span>
+                    </div>
+                    <div class="glass-card p-4 text-center">
+                        <span class="text-[8px] text-zinc-500 uppercase block mb-1">Dividendes</span>
+                        <span class="text-lg font-black text-white">2.1%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stats-view-2" style="display:none">
+                <div class="glass-card mb-4">
+                    <span class="text-[10px] font-black text-gold uppercase block mb-4 tracking-widest">Enveloppes</span>
+                    <div class="space-y-4">
+                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>PEA (Actions/ETF)</span><span>89%</span></div><div class="progress-bg"><div class="progress-fill" style="width: 89%"></div></div></div>
+                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>Wallet Crypto</span><span>11%</span></div><div class="progress-bg"><div class="progress-fill" style="width: 11%"></div></div></div>
+                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>CTO</span><span>0%</span></div><div class="progress-bg"><div class="progress-fill" style="width: 0%"></div></div></div>
+                    </div>
+                </div>
+                <div class="glass-card">
+                    <span class="text-[10px] font-black text-gold uppercase block mb-4 tracking-widest">Géographie</span>
+                    <div class="space-y-4">
+                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>USA (S&P 500 / World)</span><span>65%</span></div><div class="progress-bg"><div class="progress-fill" style="width: 65%"></div></div></div>
+                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>Europe (Coface / Immo)</span><span>35%</span></div><div class="progress-bg"><div class="progress-fill" style="width: 35%"></div></div></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -134,6 +162,7 @@
     <script>
         const PIN_SECRET = "1104"; 
         let isGhost = false;
+        let currentStatsView = 1;
 
         const ASSET_DATA = {
             WPEA: { name: "iShares MSCI World Swap", base: 192 },
@@ -156,6 +185,12 @@
                     calculateDCA();
                 }
             });
+        }
+
+        function swapStatsView() {
+            currentStatsView = currentStatsView === 1 ? 2 : 1;
+            document.getElementById('stats-view-1').style.display = currentStatsView === 1 ? 'block' : 'none';
+            document.getElementById('stats-view-2').style.display = currentStatsView === 2 ? 'block' : 'none';
         }
 
         function toggleSettings() {
@@ -192,35 +227,37 @@
         function updateFIRE(dca) {
             const mode = document.getElementById('fireMode').value;
             const initial = parseFloat(document.getElementById('initialCap').value) || 0;
-            const rate = (parseFloat(document.getElementById('yieldRate').value) || 7) / 100;
             const renteEl = document.getElementById('rente-val');
             const labelEl = document.getElementById('fire-label');
             const list = document.getElementById('forecast-list');
+            const rate = 0.07;
 
             if (mode === "RENTE") {
-                renteEl.innerText = (dca * 0.75).toFixed(0) + " €";
+                renteEl.innerText = (initial * 0.04 / 12).toFixed(0) + " €";
                 labelEl.innerText = "Rente mensuelle immédiate (4%)";
-                list.innerHTML = [5, 10, 20].map(ans => `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">+${ans} ans</span><span class="text-white font-black amount-target ${isGhost?'ghost-text-active':''}">+${(dca * 0.75 * (1 + (rate*ans))).toFixed(0)}€</span></div>`).join('');
-            } else if (mode === "PROJECTION") {
-                const total30 = initial * Math.pow(1+rate, 30) + (dca * 12 * (Math.pow(1+rate, 30) - 1) / rate);
-                renteEl.innerText = (total30 / 1000).toFixed(0) + "k €";
-                labelEl.innerText = "Capital cible à 30 ans";
                 list.innerHTML = [10, 20, 30].map(ans => {
-                    const cap = initial * Math.pow(1+rate, ans) + (dca * 12 * (Math.pow(1+rate, ans) - 1) / rate);
-                    return `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">${ans} ans</span><span class="text-gold font-black amount-target ${isGhost?'ghost-text-active':''}">+${(cap/1000).toFixed(0)}k €</span></div>`;
+                    const total = initial * Math.pow(1+rate, ans) + (dca * 12 * (Math.pow(1+rate, ans) - 1) / rate);
+                    return `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">+${ans} ans</span><span class="text-white font-black amount-target ${isGhost?'ghost-text-active':''}">+${(total*0.04/12).toFixed(0)}€ / mois</span></div>`;
                 }).join('');
             } else {
-                renteEl.innerText = "100%";
-                labelEl.innerText = "Répartition Enveloppes (DCA)";
-                const pea = 89; const wallet = 11;
-                list.innerHTML = `
-                    <div class="mb-4"><div class="flex justify-between text-[10px] font-black uppercase mb-1"><span>PEA (DCA)</span><span class="text-gold">${pea}%</span></div><div class="progress-bg"><div class="progress-fill" style="width:${pea}%"></div></div></div>
-                    <div class="mb-4"><div class="flex justify-between text-[10px] font-black uppercase mb-1"><span>Wallet Crypto</span><span class="text-gold">${wallet}%</span></div><div class="progress-bg"><div class="progress-fill" style="width:${wallet}%"></div></div></div>`;
+                renteEl.innerText = (initial / 1000).toFixed(0) + "k €";
+                labelEl.innerText = "Capital actuel vs Horizon";
+                list.innerHTML = [10, 20, 30].map(ans => {
+                    const total = initial * Math.pow(1+rate, ans) + (dca * 12 * (Math.pow(1+rate, ans) - 1) / rate);
+                    return `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">${ans} ans</span><span class="text-gold font-black amount-target ${isGhost?'ghost-text-active':''}">+${(total/1000).toFixed(0)}k €</span></div>`;
+                }).join('');
             }
         }
 
-        function updateStats(val) { document.getElementById('equityValue').innerText = val + "% Equity"; }
-        function openLiveView() { window.open(`https://fr.tradingview.com/symbols/${document.getElementById('assetSelector').value.split(':')[1]}/`, '_blank'); }
+        function updateStats() {
+            const val = document.getElementById('equitySlider').value;
+            document.getElementById('equityValue').innerText = val + "% Equity";
+        }
+
+        function openLiveView() {
+            window.open(`https://fr.tradingview.com/symbols/${document.getElementById('assetSelector').value.split(':')[1]}/`, '_blank');
+        }
+
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
