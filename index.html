@@ -1,82 +1,218 @@
-<div id="market" class="page">
-    <div class="flex justify-between items-center mb-6">
-        <p class="text-[10px] font-black text-gold uppercase tracking-[4px] italic">Moniteur d'Actifs</p>
-        <button onclick="toggleWatchlist()" class="bg-gold/10 border border-gold/30 text-gold w-10 h-10 rounded-full flex items-center justify-center font-black text-xl active:scale-90 transition-transform">+</button>
-    </div>
-
-    <div id="watchlist" class="hidden glass-card p-2 mb-6 border-gold/40 animate-pulse-subtle">
-        <p class="text-[9px] text-center font-bold text-slate-500 uppercase mb-4">Favoris de Stratégie</p>
-        <div class="space-y-2 max-h-60 overflow-y-auto pr-2">
-            <div class="flex justify-between p-3 bg-white/5 rounded-lg border border-white/5 text-[10px] font-bold"><span>MSCI WORLD (CW8)</span><span class="text-emerald-500">PAAS:CW8</span></div>
-            <div class="flex justify-between p-3 bg-white/5 rounded-lg border border-white/5 text-[10px] font-bold"><span>S&P 500 (ESE)</span><span class="text-emerald-500">EURONEXT:ESE</span></div>
-            <div class="flex justify-between p-3 bg-white/5 rounded-lg border border-white/5 text-[10px] font-bold"><span>BITCOIN (BTC)</span><span class="text-orange-500">BINANCE:BTCUSDT</span></div>
-        </div>
-    </div>
-
-    <div class="glass-card h-[450px] p-0 overflow-hidden border-gold/20">
-        <div id="tv-advanced-chart" style="height:100%;width:100%;"></div>
-    </div>
-
-    <div class="glass-card mt-4 p-4">
-        <p class="text-[9px] font-black text-slate-500 uppercase mb-3">Flash Éco</p>
-        <div class="h-40 overflow-hidden opacity-70">
-            <iframe src="https://www.widgets.investing.com/top-financial-news?theme=darkTheme&roundedCorners=true" width="100%" height="100%" frameborder="0"></iframe>
-        </div>
-    </div>
-</div>
-
-<script>
-    // AJOUTER CES FONCTIONS DANS TA BALISE <SCRIPT>
-
-    function toggleWatchlist() {
-        const wl = document.getElementById('watchlist');
-        wl.classList.toggle('hidden');
-    }
-
-    // Initialisation du graphique avancé TradingView
-    function initTradingView() {
-        new TradingView.widget({
-            "autosize": true,
-            "symbol": "EURONEXT:CW8", // MSCI World par défaut
-            "interval": "D",
-            "timezone": "Europe/Paris",
-            "theme": "dark",
-            "style": "3", // Zone (plus luxueux)
-            "locale": "fr",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_top_toolbar": false,
-            "hide_legend": false,
-            "save_image": false,
-            "container_id": "tv-advanced-chart",
-            "backgroundColor": "rgba(1, 4, 9, 1)",
-            "gridColor": "rgba(212, 175, 55, 0.05)",
-            "withdateranges": true,
-            "details": true,
-            "hotlist": false,
-            "calendar": false,
-            "show_popup_button": true,
-            "popup_width": "1000",
-            "popup_height": "650",
-            "allow_symbol_change": true // Permet de chercher tes ETF via le bouton +
-        });
-    }
-
-    // Modifier la fonction showPage existante pour charger TradingView
-    function showPage(id, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-        btn.classList.add('nav-active');
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Invest Pilot V4.2 - Grand Maître</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <style>
+        :root { --gold: #D4AF37; --bg: #010409; }
+        body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
         
-        if(id === 'stats' || id === 'fire') setTimeout(updateAll, 100);
-        
-        // Charger TradingView seulement quand on arrive sur l'onglet Marché
-        if(id === 'market') {
-            const script = document.createElement('script');
-            script.src = "https://s3.tradingview.com/tv.js";
-            script.onload = initTradingView;
-            document.head.appendChild(script);
+        .glass-card { 
+            background: linear-gradient(135deg, rgba(20,25,35,0.8) 0%, rgba(5,10,20,0.9) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 24px; padding: 24px; margin-bottom: 20px;
         }
-    }
-</script>
+
+        #sidebar { position: fixed; left: -300px; top: 0; width: 280px; height: 100%; background: #05070a; z-index: 3000; transition: 0.4s; padding: 60px 20px; border-right: 1px solid rgba(212,175,55,0.1); }
+        #sidebar.open { left: 0; }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2500; display: none; backdrop-filter: blur(8px); }
+
+        .nav-btn { font-size: 9px; font-weight: 800; color: #484f58; flex: 1; text-align: center; padding: 18px 0; border-bottom: 2px solid transparent; text-transform: uppercase; }
+        .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
+
+        .page { display: none; padding: 20px; padding-bottom: 120px; }
+        .active { display: block; }
+        
+        /* Style Watchlist V4.2 */
+        #watchlist { transition: all 0.3s ease; max-height: 0; overflow: hidden; opacity: 0; }
+        #watchlist.open { max-height: 300px; opacity: 1; margin-bottom: 20px; }
+    </style>
+</head>
+<body onload="initApp()">
+
+    <div id="overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebar">
+        <p class="text-[10px] font-black text-gold uppercase tracking-[4px] mb-8 text-center">Le Coffre (The Vault)</p>
+        <textarea id="vault-input" oninput="saveVault()" class="w-full h-40 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none mb-6" placeholder="Notes confidentielles..."></textarea>
+        <button onclick="hardReset()" class="w-full p-4 bg-red-900/10 rounded-xl text-[10px] font-black uppercase text-red-500/70 border border-red-900/20">⚠️ Réinitialiser Tout</button>
+    </div>
+
+    <div id="lock-screen" class="fixed inset-0 bg-[#010409] z-[5000] flex flex-col items-center justify-center">
+        <img src="1773669549907.png" class="w-20 h-20 rounded-3xl mb-10 border border-gold/20 p-1">
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent text-center text-5xl w-40 border-b-2 border-gold pb-2 text-gold outline-none">
+    </div>
+
+    <div id="app-content" style="display:none">
+        <header class="p-6 pt-12 flex justify-between items-center border-b border-white/5 bg-[#010409]/90 sticky top-0 z-50">
+            <button onclick="toggleSidebar()" class="text-gold p-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h16M4 16h16" stroke-linecap="round"/></svg></button>
+            <span id="current-date" class="text-[11px] font-black text-gold uppercase tracking-widest text-center">Mars 2026</span>
+            <img src="1773669549907.png" class="w-10 h-10 rounded-xl border border-gold/30">
+        </header>
+
+        <nav class="flex border-b border-white/5 sticky top-[95px] bg-[#010409] z-50">
+            <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
+            <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
+            <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
+            <button onclick="showPage('market', this)" class="nav-btn">MARCHÉ</button>
+        </nav>
+
+        <div id="main" class="page active">
+            <div class="glass-card">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-2 italic text-center">Allocation Stratégique</p>
+                <div class="flex items-end gap-4 mb-8">
+                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-6xl font-black w-full tracking-tighter bg-transparent outline-none">
+                    <button onclick="saveToHistory()" class="bg-gold w-16 h-16 rounded-2xl flex items-center justify-center mb-1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4"><path d="M5 13l4 4L19 7" stroke-linecap="round"/></svg></button>
+                </div>
+                <div id="calculation-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <div id="fire" class="page">
+            <div class="glass-card">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-4 text-center">Wealth Forecast (7%)</p>
+                <div class="text-5xl font-black text-center mb-10 text-white" id="rente-val">0 €</div>
+                <div class="space-y-4 border-t border-white/5 pt-6" id="forecast-list"></div>
+            </div>
+        </div>
+
+        <div id="stats" class="page">
+            <div class="glass-card"><canvas id="allocChart" height="250"></canvas></div>
+            <div class="glass-card"><canvas id="geoChart" height="250"></canvas></div>
+        </div>
+
+        <div id="market" class="page">
+            <div class="flex justify-between items-center mb-6">
+                <p class="text-[10px] font-black text-gold uppercase tracking-[4px]">Live Terminal</p>
+                <button onclick="toggleWatchlist()" class="bg-gold text-black w-8 h-8 rounded-full font-black text-xl flex items-center justify-center">+</button>
+            </div>
+
+            <div id="watchlist" class="glass-card p-4">
+                <p class="text-[9px] font-bold text-slate-500 uppercase mb-3">Mes Favoris</p>
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="loadSymbol('EURONEXT:CW8')" class="flex justify-between bg-white/5 p-3 rounded-lg text-[10px] font-bold"><span>MSCI World (CW8)</span><span class="text-gold">Voir →</span></button>
+                    <button onclick="loadSymbol('EURONEXT:ESE')" class="flex justify-between bg-white/5 p-3 rounded-lg text-[10px] font-bold"><span>S&P 500 (ESE)</span><span class="text-gold">Voir →</span></button>
+                    <button onclick="loadSymbol('BINANCE:BTCUSDT')" class="flex justify-between bg-white/5 p-3 rounded-lg text-[10px] font-bold"><span>Bitcoin (BTC)</span><span class="text-gold">Voir →</span></button>
+                </div>
+            </div>
+
+            <div class="glass-card h-[400px] p-0 overflow-hidden border-gold/20" id="tv_container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        const PIN_SECRET = "1104";
+        const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
+        let charts = {};
+
+        function initApp() {
+            document.getElementById('pinInput').addEventListener('input', (e) => {
+                if(e.target.value === PIN_SECRET) {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'block';
+                    document.getElementById('vault-input').value = localStorage.getItem('invest_vault') || '';
+                    updateAll();
+                }
+            });
+            calculateDCA();
+        }
+
+        function toggleSidebar() { 
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('overlay');
+            s.classList.toggle('open');
+            o.style.display = s.classList.contains('open') ? 'block' : 'none';
+        }
+
+        function toggleWatchlist() { document.getElementById('watchlist').classList.toggle('open'); }
+
+        function saveVault() { localStorage.setItem('invest_vault', document.getElementById('vault-input').value); }
+
+        function loadSymbol(symbol) {
+            new TradingView.widget({
+                "autosize": true, "symbol": symbol, "interval": "D", "timezone": "Europe/Paris",
+                "theme": "dark", "style": "3", "locale": "fr", "container_id": "tv_container",
+                "backgroundColor": "#010409", "gridColor": "rgba(212, 175, 55, 0.05)",
+                "hide_top_toolbar": false, "allow_symbol_change": true, "save_image": false
+            });
+            toggleWatchlist();
+        }
+
+        function calculateDCA() {
+            const val = parseFloat(document.getElementById('dcaInput').value) || 0;
+            const container = document.getElementById('calculation-list');
+            let res = {...baseData};
+            if (val > 330) { const s = val - 330; res.world += s * 0.8; res.crypto += s * 0.2; }
+            else { const r = val / 330; Object.keys(baseData).forEach(k => res[k] *= r); }
+            container.innerHTML = Object.keys(res).map(k => `
+                <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
+                    <span class="text-[10px] font-black text-gold uppercase opacity-60">${k}</span>
+                    <span class="text-xl font-black text-white">${res[k].toFixed(2)}€</span>
+                </div>`).join('');
+        }
+
+        function updateAll() {
+            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
+            const total = history.reduce((sum, item) => sum + item.amount, 0);
+            const rente = (total * 0.04) / 12;
+            document.getElementById('rente-val').innerText = rente.toFixed(2) + " €";
+            
+            const dca = parseFloat(document.getElementById('dcaInput').value) || 330;
+            const forecast = (y) => {
+                let cap = total;
+                for(let i=0; i<y*12; i++) cap = (cap + dca) * (1 + 0.07/12);
+                return cap.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:0});
+            };
+            
+            document.getElementById('forecast-list').innerHTML = [10, 20, 30].map(y => `
+                <div class="border-l-2 border-gold pl-4 py-2">
+                    <p class="text-[9px] text-gold font-black uppercase">Horizon ${y} ans</p>
+                    <p class="text-2xl font-black">${forecast(y)}</p>
+                </div>`).join('');
+
+            renderCharts();
+        }
+
+        function renderCharts() {
+            const setup = (id, data, colors) => {
+                if(charts[id]) charts[id].destroy();
+                charts[id] = new Chart(document.getElementById(id), {
+                    type: 'doughnut',
+                    data: { datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+                    options: { cutout: '85%', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            };
+            setup('allocChart', [85, 11, 4], ['#D4AF37', '#10b981', '#f59e0b']);
+            setup('geoChart', [70, 20, 10], ['#ef4444', '#D4AF37', '#6366f1']);
+        }
+
+        function saveToHistory() {
+            const val = parseFloat(document.getElementById('dcaInput').value);
+            if(!val) return;
+            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
+            history.push({ amount: val });
+            localStorage.setItem('invest_history', JSON.stringify(history));
+            updateAll();
+            alert("Enregistré.");
+        }
+
+        function showPage(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            btn.classList.add('nav-active');
+            if(id === 'market') loadSymbol('EURONEXT:CW8');
+            if(id === 'stats' || id === 'fire') setTimeout(updateAll, 50);
+        }
+
+        function hardReset() { if(confirm("Tout effacer ?")) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>
