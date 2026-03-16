@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pilotage Invest</title>
+    
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .page { display: none; height: calc(100vh - 65px); }
+        .active { display: block; }
+        #lock-screen { position: fixed; inset: 0; background: #111827; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .row-calc { border-bottom: 1px solid #2d3748; padding: 10px 0; align-items: center; }
+        .copy-btn { font-size: 10px; padding: 2px 8px; border-radius: 4px; transition: all 0.2s; background: #374151; }
+        .copy-btn:active { background: #3b82f6; }
+        .history-item { border-left: 3px solid #3b82f6; background: #1f2937; margin-bottom: 8px; padding: 10px; border-radius: 0 8px 8px 0; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans overflow-hidden">
+
+    <div id="lock-screen">
+        <div class="mb-6 text-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold mb-4 italic text-gray-200">Accès Privé</h2>
+        <input type="password" id="pinInput" placeholder="PIN" inputmode="numeric" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-center text-2xl tracking-widest w-40 focus:outline-none focus:border-blue-500">
+        <button onclick="checkPin()" class="mt-4 bg-blue-600 hover:bg-blue-500 px-8 py-2 rounded-lg font-bold transition-colors">Entrer</button>
+        <p id="pinError" class="text-red-500 text-xs mt-2 hidden">Code incorrect</p>
+    </div>
+
+    <nav class="flex justify-around bg-gray-800 p-4 border-b border-gray-700 shadow-lg">
+        <button onclick="showPage('main', this)" class="text-[10px] font-bold uppercase tracking-widest text-blue-400 border-b-2 border-blue-400">DCA</button>
+        <button onclick="showPage('history', this)" class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Historique</button>
+        <button onclick="showPage('charts', this)" class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Graphiques</button>
+        <button onclick="showPage('news-full', this)" class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Actualités</button>
+    </nav>
+
+    <div id="main" class="page active p-4 overflow-y-auto">
+        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 mb-6">
+            <h3 class="text-blue-400 text-xs uppercase font-black mb-4 flex justify-between">
+                Répartition Automatique
+                <span id="current-date" class="text-gray-500 font-normal capitalize"></span>
+            </h3>
+            <div class="mb-6 flex gap-2">
+                <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-2xl font-mono text-blue-400">
+                <button onclick="saveToHistory()" class="bg-blue-600 px-4 rounded-xl font-bold text-xs uppercase">Valider</button>
+            </div>
+            <div id="calculation-list" class="space-y-1"></div>
+            <p id="surplus-msg" class="text-[10px] bg-blue-900/30 text-blue-300 p-2 rounded mt-4 italic hidden text-center">✨ Surplus injecté dans le World et le Bitcoin.</p>
+        </div>
+    </div>
+
+    <div id="history" class="page p-4 overflow-y-auto">
+        <h2 class="text-lg font-bold mb-4">Ma Progression</h2>
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-6"><canvas id="progressionChart" height="200"></canvas></div>
+        <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">Journal des versements</h2><button onclick="clearHistory()" class="text-[9px] text-red-400 uppercase">Réinitialiser</button></div>
+        <div id="history-list" class="space-y-2 text-sm"></div>
+    </div>
+
+    <div id="charts" class="page p-0"><div id="tv_container" class="h-full"></div></div>
+
+    <div id="news-full" class="page p-4 overflow-y-auto">
+        <h2 class="text-lg font-bold mb-4">Actualités Financières (FR)</h2>
+        <div class="space-y-3">
+            <a href="https://www.zonebourse.com/actualite/bourse/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
+                <span class="text-blue-400 font-bold block">ZoneBourse</span>
+                <span class="text-xs text-gray-400">Analyses et flux en direct du marché français.</span>
+            </a>
+            <a href="https://www.boursorama.com/bourse/actualites/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
+                <span class="text-blue-400 font-bold block">Boursorama Actu</span>
+                <span class="text-xs text-gray-400">Toute l'actualité économique et financière.</span>
+            </a>
+            <a href="https://investir.lesechos.fr/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
+                <span class="text-blue-400 font-bold block">Investir - Les Échos</span>
+                <span class="text-xs text-gray-400">Conseils et stratégies pour votre PEA.</span>
+            </a>
+            <div class="p-4 text-[10px] text-gray-500 text-center italic">
+                Note : Pour des raisons de sécurité, les flux RSS sont consultables en cliquant sur les liens ci-dessus.
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        const PIN_CODE = "1104"; // <-- REMPLACEZ 1234 PAR VOTRE CODE ICI
+        const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
+        const baseTotal = 330;
+        let myChart = null;
+
+        function checkPin() {
+            if(document.getElementById('pinInput').value === PIN_CODE) {
+                document.getElementById('lock-screen').style.display = 'none';
+            } else {
+                document.getElementById('pinError').classList.remove('hidden');
+                document.getElementById('pinInput').value = '';
+            }
+        }
+
+        function calculateDCA() {
+            const total = parseFloat(document.getElementById('dcaInput').value) || 0;
+            const container = document.getElementById('calculation-list');
+            const msg = document.getElementById('surplus-msg');
+            let res = {...baseData};
+            if (total > baseTotal) {
+                const s = total - baseTotal;
+                res.world += s * 0.8; res.crypto += s * 0.2;
+                msg.classList.remove('hidden');
+            } else {
+                const r = total / baseTotal;
+                Object.keys(baseData).forEach(k => res[k] *= r);
+                msg.classList.add('hidden');
+            }
+            const labels = { world: "MSCI World (CW8)", cofa: "Coface", immo: "Immo Europe", em: "Emerging", def: "Défense Europe", sp: "S&P 500 Swap", crypto: "Bitcoin / Crypto" };
+            container.innerHTML = Object.keys(res).map(k => `
+                <div class="flex justify-between row-calc ${k === 'crypto' ? 'border-none mt-4 text-orange-400' : ''}">
+                    <span class="text-xs">${labels[k]}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono font-bold">${res[k].toFixed(2)}</span>
+                        <button onclick="copyToClipboard('${res[k].toFixed(2)}', this)" class="copy-btn">Copier</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function saveToHistory() {
+            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
+            history.push({ date: new Date().toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }), amount: parseFloat(document.getElementById('dcaInput').value) });
+            localStorage.setItem('invest_history', JSON.stringify(history));
+            renderHistory(); updateChart(); alert("Versement enregistré !");
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('invest_history') || '[]').reverse();
+            document.getElementById('history-list').innerHTML = history.map(item => `
+                <div class="history-item flex justify-between items-center">
+                    <div><p class="text-[10px] text-gray-500 uppercase font-bold">${item.date}</p><p class="text-lg font-mono text-blue-400">${item.amount.toFixed(2)} €</p></div>
+                </div>`).join('');
+        }
+
+        function updateChart() {
+            const history = JSON.parse(localStorage.getItem('invest_history') || '[]');
+            const ctx = document.getElementById('progressionChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: history.map(h => h.date), datasets: [{ data: history.map(h => h.amount), backgroundColor: '#3b82f6', borderRadius: 5 }] },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#2d3748' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const old = btn.innerText; btn.innerText = "✓"; btn.classList.add('bg-green-600');
+                setTimeout(() => { btn.innerText = old; btn.classList.remove('bg-green-600'); }, 1000);
+            });
+        }
+
+        function showPage(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-blue-400', 'border-b-2', 'border-blue-400'));
+            btn.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+            if(id === 'history') setTimeout(updateChart, 100);
+        }
+
+        function clearHistory() { if(confirm("Réinitialiser l'historique ?")) { localStorage.removeItem('invest_history'); renderHistory(); updateChart(); } }
+
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', { month: 'long' });
+        calculateDCA(); renderHistory();
+        new TradingView.widget({ "container_id": "tv_container", "autosize": true, "symbol": "AMUNDI:CW8", "interval": "D", "theme": "dark", "style": "1", "locale": "fr", "allow_symbol_change": true });
+    </script>
+</body>
+</html>
