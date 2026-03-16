@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Pilotage Invest</title>
     
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+    <link rel="apple-touch-icon" href="1773669549907.png">
+    <link rel="icon" type="image/png" href="1773669549907.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -32,7 +33,7 @@
         </div>
         <h2 class="text-xl font-bold mb-4 italic text-gray-200">Accès Privé</h2>
         <input type="password" id="pinInput" placeholder="PIN" inputmode="numeric" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-center text-2xl tracking-widest w-40 focus:outline-none focus:border-blue-500">
-        <button onclick="checkPin()" class="mt-4 bg-blue-600 hover:bg-blue-500 px-8 py-2 rounded-lg font-bold transition-colors">Entrer</button>
+        <button onclick="checkPin()" class="mt-4 bg-blue-600 hover:bg-blue-500 px-8 py-2 rounded-lg font-bold">Entrer</button>
         <p id="pinError" class="text-red-500 text-xs mt-2 hidden">Code incorrect</p>
     </div>
 
@@ -44,7 +45,7 @@
     </nav>
 
     <div id="main" class="page active p-4 overflow-y-auto">
-        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 mb-6">
+        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 mb-6 shadow-2xl">
             <h3 class="text-blue-400 text-xs uppercase font-black mb-4 flex justify-between">
                 Répartition Automatique
                 <span id="current-date" class="text-gray-500 font-normal capitalize"></span>
@@ -59,38 +60,31 @@
     </div>
 
     <div id="history" class="page p-4 overflow-y-auto">
-        <h2 class="text-lg font-bold mb-4">Ma Progression</h2>
-        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-6"><canvas id="progressionChart" height="200"></canvas></div>
-        <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">Journal des versements</h2><button onclick="clearHistory()" class="text-[9px] text-red-400 uppercase">Réinitialiser</button></div>
+        <h2 class="text-lg font-bold mb-4 text-gray-200">Ma Progression</h2>
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-6 shadow-lg"><canvas id="progressionChart" height="200"></canvas></div>
+        <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">Journal</h2><button onclick="clearHistory()" class="text-[9px] text-red-400 uppercase">Effacer</button></div>
         <div id="history-list" class="space-y-2 text-sm"></div>
     </div>
 
     <div id="charts" class="page p-0"><div id="tv_container" class="h-full"></div></div>
 
-    <div id="news-full" class="page p-4 overflow-y-auto">
-        <h2 class="text-lg font-bold mb-4">Actualités Financières (FR)</h2>
+    <div id="news-full" class="page p-4 overflow-y-auto text-sm">
+        <h2 class="text-lg font-bold mb-4 italic">Actualités (FR)</h2>
         <div class="space-y-3">
-            <a href="https://www.zonebourse.com/actualite/bourse/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
-                <span class="text-blue-400 font-bold block">ZoneBourse</span>
-                <span class="text-xs text-gray-400">Analyses et flux en direct du marché français.</span>
+            <a href="https://www.zonebourse.com/actualite/bourse/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block shadow">
+                <span class="text-blue-400 font-bold block">ZoneBourse ↗</span>
+                <span class="text-[10px] text-gray-400 italic text-xs">Analyses et flux en temps réel.</span>
             </a>
-            <a href="https://www.boursorama.com/bourse/actualites/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
-                <span class="text-blue-400 font-bold block">Boursorama Actu</span>
-                <span class="text-xs text-gray-400">Toute l'actualité économique et financière.</span>
+            <a href="https://www.boursorama.com/bourse/actualites/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block shadow">
+                <span class="text-blue-400 font-bold block">Boursorama Actu ↗</span>
+                <span class="text-[10px] text-gray-400 italic text-xs">Économie et actualité financière.</span>
             </a>
-            <a href="https://investir.lesechos.fr/" target="_blank" class="bg-gray-800 p-4 rounded-xl border border-gray-700 block transition-transform active:scale-95">
-                <span class="text-blue-400 font-bold block">Investir - Les Échos</span>
-                <span class="text-xs text-gray-400">Conseils et stratégies pour votre PEA.</span>
-            </a>
-            <div class="p-4 text-[10px] text-gray-500 text-center italic">
-                Note : Pour des raisons de sécurité, les flux RSS sont consultables en cliquant sur les liens ci-dessus.
-            </div>
         </div>
     </div>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        const PIN_CODE = "1104"; // <-- REMPLACEZ 1234 PAR VOTRE CODE ICI
+        const PIN_CODE = "1104"; // MODIFIEZ ICI VOTRE CODE PIN
         const baseData = { world: 192, cofa: 30, immo: 27, em: 22, def: 12, sp: 12, crypto: 35 };
         const baseTotal = 330;
         let myChart = null;
@@ -118,7 +112,7 @@
                 Object.keys(baseData).forEach(k => res[k] *= r);
                 msg.classList.add('hidden');
             }
-            const labels = { world: "MSCI World (CW8)", cofa: "Coface", immo: "Immo Europe", em: "Emerging", def: "Défense Europe", sp: "S&P 500 Swap", crypto: "Bitcoin / Crypto" };
+            const labels = { world: "MSCI World", cofa: "Coface", immo: "Immo Europe", em: "Emerging", def: "Défense", sp: "S&P 500", crypto: "Bitcoin / Crypto" };
             container.innerHTML = Object.keys(res).map(k => `
                 <div class="flex justify-between row-calc ${k === 'crypto' ? 'border-none mt-4 text-orange-400' : ''}">
                     <span class="text-xs">${labels[k]}</span>
@@ -170,7 +164,7 @@
             if(id === 'history') setTimeout(updateChart, 100);
         }
 
-        function clearHistory() { if(confirm("Réinitialiser l'historique ?")) { localStorage.removeItem('invest_history'); renderHistory(); updateChart(); } }
+        function clearHistory() { if(confirm("Effacer tout ?")) { localStorage.removeItem('invest_history'); renderHistory(); updateChart(); } }
 
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', { month: 'long' });
         calculateDCA(); renderHistory();
