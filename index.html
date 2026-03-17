@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V6.9.1 - IP Edition</title>
+    <title>Invest Pilot V6.9.2 - Luxury Pulse</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,19 +24,31 @@
 
         .is-ghost { filter: blur(15px) !important; pointer-events: none; }
         
-        /* Logo "Dual IP" Inspiré */
+        /* Logo "Golden IP" Luxe & Bourse */
         .app-logo {
             width: 85px; height: 85px;
-            background: #000;
+            background: linear-gradient(145deg, #101010 0%, #000 100%); /* Texture Carbone */
             border: 2px solid var(--gold);
             border-radius: 22px;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05);
             margin-bottom: 20px;
+        }
+        /* Lettres IP en Or Relief */
+        .logo-ip {
+            background: linear-gradient(to bottom right, #FFD700 0%, #D4AF37 50%, #996515 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3rem; font-weight: 900; font-style: italic;
+            letter-spacing: -3px;
+            transform: skewX(-5deg);
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
         }
 
         /* Sparklines & DCA Styles */
         .sparkline { width: 50px; height: 20px; stroke-width: 2; fill: none; }
+        .perf-up { color: var(--up); }
+        .perf-down { color: var(--down); }
         
         /* Bouton FIRE (Feedback Temporaire) */
         .fire-btn-dynamic { 
@@ -63,16 +75,16 @@
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
         <div class="app-logo">
-            <span class="text-white text-5xl font-black italic tracking-tighter" style="font-family: 'Inter'; transform: skewX(-5deg);">IP</span>
+            <span class="logo-ip">IP</span>
         </div>
         <h1 class="text-gold font-black text-2xl tracking-[6px] uppercase mb-12">Invest Pilot</h1>
         <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-white font-black tracking-[10px] mb-4">
-        <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Code : 1104</p>
+        <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Code d'accès requis</p>
     </div>
 
     <div id="app-content" style="display:none">
         <header class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-6">
-            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">V6.9.1 Dual IP</div>
+            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">V6.9.2 Luxury Pulse</div>
             <div class="flex gap-3">
                 <button onclick="resetApp()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">↻</button>
                 <button onclick="toggleGhost()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">👻</button>
@@ -194,14 +206,18 @@
                 const val = STRATEGY[k].isF ? STRATEGY[k].base : (STRATEGY[k].base * ratio);
                 totDca += parseFloat(val);
                 if(STRATEGY[k].isEq) totEq += parseFloat(val);
-                const isPos = parseFloat(marketData[k]) >= 0;
+                const perf = parseFloat(marketData[k]);
+                const isPos = perf >= 0;
+
+                const textClass = isPos ? 'perf-up' : 'perf-down';
+                const sparkPath = isPos ? "M 0,15 L 10,10 L 20,18 L 30,5 L 40,12 L 50,2" : "M 0,5 L 10,10 L 20,2 L 30,15 L 40,8 L 50,18";
 
                 return `<div class="glass-card !mb-2 flex justify-between items-center py-4">
                     <div class="flex items-center gap-3">
-                        <svg class="sparkline" style="stroke: ${isPos ? 'var(--up)' : 'var(--down)'}"><path d="M 0,15 L 10,10 L 20,18 L 30,5 L 40,12 L 50,2" /></svg>
+                        <svg class="sparkline" style="stroke: ${isPos ? 'var(--up)' : 'var(--down)'}"><path d="${sparkPath}" /></svg>
                         <div><span class="text-[10px] font-black text-gold uppercase">${k}</span><p class="text-[7px] text-zinc-600 font-bold uppercase">${STRATEGY[k].name}</p></div>
                     </div>
-                    <div class="text-right text-lg font-black blur-target ${isGhost?'is-ghost':''}">
+                    <div class="text-right text-lg font-black blur-target ${isGhost?'is-ghost':''} ${textClass}">
                         ${dcaViewMode === 'amount' ? parseFloat(val).toFixed(2)+'€' : (isPos?'+':'')+marketData[k]+'%'}
                     </div>
                 </div>`;
