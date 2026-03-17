@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V6.7.0</title>
+    <title>Invest Pilot V6.8.0</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,44 +24,57 @@
 
         .is-ghost { filter: blur(15px) !important; pointer-events: none; }
         
-        /* Nouveau bouton Fire Rempli */
-        .fire-btn-full { 
-            background: #1a1a1a; 
+        /* Bouton FIRE corrigé (Feedback temporaire) */
+        .fire-btn-dynamic { 
+            background: #151515; 
             border: 1px solid #222;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            cursor: pointer; 
+            transition: all 0.15s ease;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .fire-btn-full:hover, .fire-btn-full:active { 
-            background: var(--gold); 
-            border-color: var(--gold);
+        /* Effet au toucher uniquement */
+        .fire-btn-dynamic:active { 
+            background: var(--gold) !important; 
+            transform: scale(0.96);
         }
-        .fire-btn-full:hover span, .fire-btn-full:active span { 
-            color: black !important; 
-        }
+        .fire-btn-dynamic:active span { color: black !important; }
 
-        .progress-fill { transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1); }
+        /* Barre VAULT en DORÉ */
+        .progress-bar-container { background: #111; border: 1px solid #1a1a1a; height: 12px; border-radius: 99px; overflow: hidden; }
+        .progress-gold-fill { 
+            height: 100%;
+            background: linear-gradient(90deg, #996515 0%, #D4AF37 50%, #FFD700 100%);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            width: 0%;
+        }
         
-        /* Logo Animation */
-        .logo-pulse { animation: pulseLogo 3s infinite ease-in-out; }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
+        /* Logo d'accueil */
+        .lock-logo {
+            width: 80px; height: 80px;
+            border: 3px solid var(--gold);
+            border-radius: 22px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            margin-bottom: 24px;
+        }
     </style>
 </head>
 <body onload="initApp()">
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
-        <div class="flex flex-col items-center mb-12">
-            <div class="w-20 h-20 bg-gradient-to-tr from-gold to-yellow-600 rounded-3xl flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.3)] mb-6 logo-pulse">
-                <span class="text-black text-4xl font-black italic">P</span>
-            </div>
-            <h1 class="text-gold font-black text-2xl tracking-[8px] uppercase">Invest Pilot</h1>
+        <div class="lock-logo">
+            <span class="text-gold text-4xl font-black italic">P</span>
         </div>
-        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-white font-black tracking-[10px] mb-4">
-        <p class="text-zinc-600 text-[9px] font-bold uppercase tracking-widest">Entrez votre code</p>
+        <h1 class="text-white font-black text-2xl tracking-[6px] uppercase mb-12">Invest Pilot</h1>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-gold font-black tracking-[10px] mb-4">
+        <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Code requis</p>
     </div>
 
     <div id="app-content" style="display:none">
         <header class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-6">
-            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-30 text-gold">V6.7 Deep Polish</div>
+            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">V6.8 Chrome</div>
             <div class="flex gap-3">
                 <button onclick="resetApp()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">↻</button>
                 <button onclick="toggleGhost()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">👻</button>
@@ -76,15 +89,12 @@
         </nav>
 
         <div id="main" class="page active mt-16">
-            <div class="glass-card flex items-center gap-4 border-gold/10">
-                <div class="flex-grow">
-                    <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Injection DCA</span>
+            <div class="glass-card border-gold/10">
+                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Injection DCA</span>
+                <div class="flex items-center gap-4">
                     <input type="number" id="dcaInput" value="330" oninput="calculateAll()" class="text-5xl font-black bg-transparent text-white outline-none w-full tracking-tighter">
+                    <button onclick="confirmDCA()" class="bg-gold text-black w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold active:scale-90">✓</button>
                 </div>
-                <button onclick="confirmDCA(this)" class="bg-gold text-black w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold active:scale-90">✓</button>
-            </div>
-            <div class="flex justify-end mb-4">
-                <button onclick="toggleDcaView()" id="viewLabel" class="text-[8px] font-black bg-zinc-950 border border-zinc-900 px-3 py-2 rounded-lg text-gold uppercase">Mode % ⇄</button>
             </div>
             <div id="dca-list" class="space-y-2"></div>
         </div>
@@ -97,11 +107,11 @@
             </div>
             <div class="glass-card">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Progression Objectif 50k</span>
-                    <span class="font-black text-white text-sm blur-target" id="success-pct">0%</span>
+                    <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Objectif 50k</span>
+                    <span class="font-black text-gold text-sm blur-target" id="success-pct">0%</span>
                 </div>
-                <div class="h-2.5 bg-zinc-900 rounded-full overflow-hidden p-[2px]">
-                    <div id="success-bar" class="progress-fill h-full bg-gradient-to-r from-gold to-yellow-400 rounded-full" style="width:0%"></div>
+                <div class="progress-bar-container">
+                    <div id="success-bar" class="progress-gold-fill"></div>
                 </div>
             </div>
         </div>
@@ -109,8 +119,8 @@
         <div id="fire" class="page mt-16 text-center">
             <div class="glass-card py-10" onclick="toggleFireView()">
                 <div class="text-6xl font-black text-white blur-target" id="fire-val">0 €</div>
-                <p id="fire-label" class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-2 mb-8 italic">Rente Mensuelle</p>
-                <div class="fire-btn-full p-4 rounded-2xl inline-block px-10">
+                <p id="fire-label" class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-2 mb-8 italic">Rente Mensuelle (4%)</p>
+                <div class="fire-btn-dynamic p-4 rounded-2xl inline-block px-10">
                     <span class="text-[11px] font-black text-gold uppercase tracking-tighter" id="virement-countdown">-- virements vers 50k</span>
                 </div>
                 <div id="forecast-list" class="mt-8 space-y-4 text-left border-t border-zinc-900 pt-6"></div>
@@ -118,18 +128,16 @@
         </div>
 
         <div id="stats" class="page mt-16">
-            <div class="space-y-4">
-                <div class="glass-card">
-                    <span class="text-[10px] font-black text-gold uppercase tracking-[2px] block mb-4">Exposition Equity</span>
-                    <div class="flex justify-between items-end"><div class="text-4xl font-black text-white blur-target" id="equityDisplay">0%</div><span class="text-[9px] font-black text-zinc-500 uppercase">Risque</span></div>
-                </div>
-                <div class="glass-card">
-                    <span class="text-[10px] font-black text-gold uppercase tracking-[2px] block mb-4">Zones Géo</span>
-                    <div class="space-y-2 text-[10px] font-bold uppercase">
-                        <div class="flex justify-between"><span>USA</span><span class="text-white">65%</span></div>
-                        <div class="flex justify-between"><span>Europe</span><span class="text-white">25%</span></div>
-                        <div class="flex justify-between"><span>Emerging</span><span class="text-white">10%</span></div>
-                    </div>
+            <div class="glass-card">
+                <span class="text-[10px] font-black text-gold uppercase tracking-[2px] block mb-4">Exposition Equity</span>
+                <div class="flex justify-between items-end"><div class="text-4xl font-black text-white blur-target" id="equityDisplay">0%</div><span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Risque</span></div>
+            </div>
+            <div class="glass-card">
+                <span class="text-[10px] font-black text-gold uppercase tracking-[2px] block mb-4">Zones Géo</span>
+                <div class="space-y-3 text-[11px] font-bold uppercase">
+                    <div class="flex justify-between"><span>États-Unis</span><span class="text-white">65%</span></div>
+                    <div class="flex justify-between border-t border-white/5 pt-2"><span>Europe</span><span class="text-white">25%</span></div>
+                    <div class="flex justify-between border-t border-white/5 pt-2"><span>Emerging</span><span class="text-white">10%</span></div>
                 </div>
             </div>
         </div>
@@ -137,19 +145,18 @@
 
     <script>
         const PIN = "1104";
-        let isGhost = false, dcaViewMode = 'amount', fireViewMode = 'rente';
+        let isGhost = false, fireViewMode = 'rente';
         let capitalBase = 12472.38;
-        let marketData = {};
 
         const STRATEGY = {
-            WPEA: { name: "MSCI World", base: 192, isEquity: true },
-            COFA: { name: "Coface SA", base: 30, isEquity: true },
-            PMEH: { name: "PEA Immobilier", base: 27, isEquity: false },
-            PAEEM: { name: "Emerging Markets", base: 22, isEquity: true },
-            ASAM: { name: "Defense Europe", base: 12, isEquity: true },
-            ESE: { name: "S&P 500 Swap", base: 12, isEquity: true },
-            Crypto: { name: "Bitcoin", base: 35, isEquity: true },
-            SENS: { name: "Sensorion", base: 22.38, isEquity: true, isFixed: true }
+            WPEA: { name: "MSCI World", base: 192, isEq: true },
+            COFA: { name: "Coface SA", base: 30, isEq: true },
+            PMEH: { name: "PEA Immobilier", base: 27, isEq: false },
+            PAEEM: { name: "Emerging Markets", base: 22, isEq: true },
+            ASAM: { name: "Defense Europe", base: 12, isEq: true },
+            ESE: { name: "S&P 500 Swap", base: 12, isEq: true },
+            Crypto: { name: "Bitcoin", base: 35, isEq: true },
+            SENS: { name: "Sensorion", base: 22.38, isEq: true, isF: true }
         };
 
         function initApp() {
@@ -157,60 +164,38 @@
                 if(e.target.value === PIN) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
-                    fetchMarketData();
-                    // Forcer le remplissage de la barre
-                    setTimeout(calculateAll, 100);
+                    setTimeout(calculateAll, 200);
                 }
             });
-        }
-
-        function resetApp() { document.getElementById('dcaInput').value = 330; calculateAll(); }
-        function editCapital() {
-            const newVal = prompt("Nouveau capital (€):", capitalBase);
-            if (newVal) { capitalBase = parseFloat(newVal); calculateAll(); }
-        }
-
-        function toggleFireView() { fireViewMode = fireViewMode === 'rente' ? 'growth' : 'rente'; calculateAll(); }
-        function confirmDCA() { capitalBase += parseFloat(document.getElementById('dcaInput').value); calculateAll(); }
-
-        function fetchMarketData() {
-            Object.keys(STRATEGY).forEach(k => { marketData[k] = (Math.random() * 3 - 1).toFixed(2); });
-            calculateAll();
         }
 
         function calculateAll() {
             const input = parseFloat(document.getElementById('dcaInput').value) || 0;
             const ratio = input / 330;
-            let totalEq = 0, totalDca = 0;
+            let totEq = 0, totDca = 0;
 
             document.getElementById('dca-list').innerHTML = Object.keys(STRATEGY).map(k => {
-                const val = STRATEGY[k].isFixed ? STRATEGY[k].base : (STRATEGY[k].base * ratio);
-                totalDca += parseFloat(val);
-                if(STRATEGY[k].isEquity) totalEq += parseFloat(val);
-                const isPos = parseFloat(marketData[k]) >= 0;
+                const val = STRATEGY[k].isF ? STRATEGY[k].base : (STRATEGY[k].base * ratio);
+                totDca += parseFloat(val);
+                if(STRATEGY[k].isEq) totEq += parseFloat(val);
                 return `<div class="glass-card !mb-2 flex justify-between items-center py-4">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-12 h-5 stroke-2 fill-none" style="stroke: ${isPos ? 'var(--up)' : 'var(--down)'}"><path d="M 0,15 L 10,10 L 20,18 L 30,5 L 40,12 L 50,2" /></svg>
-                        <div><span class="text-[10px] font-black text-gold uppercase">${k}</span><p class="text-[7px] text-zinc-600 font-bold uppercase">${STRATEGY[k].name}</p></div>
-                    </div>
-                    <div class="text-right text-lg font-black blur-target ${isGhost?'is-ghost':''}">
-                        ${dcaViewMode === 'amount' ? parseFloat(val).toFixed(2)+'€' : (isPos?'+':'')+marketData[k]+'%'}
-                    </div>
+                    <div><span class="text-[10px] font-black text-gold uppercase">${k}</span><p class="text-[7px] text-zinc-600 font-bold uppercase">${STRATEGY[k].name}</p></div>
+                    <div class="text-right text-lg font-black blur-target ${isGhost?'is-ghost':''}"> ${parseFloat(val).toFixed(2)}€ </div>
                 </div>`;
             }).join('');
 
             const totalVal = capitalBase;
             document.getElementById('total-val').innerText = totalVal.toLocaleString('fr-FR') + " €";
             
-            // Correction moteur barre de progression
+            // Fix Barre Vault Or
             const pct = Math.min((totalVal / 50000) * 100, 100);
-            document.getElementById('success-bar').style.width = pct + "%";
+            setTimeout(() => { document.getElementById('success-bar').style.width = pct + "%"; }, 100);
             document.getElementById('success-pct').innerText = Math.round(pct) + "%";
             
-            updateOtherStats(input, totalEq, totalDca, totalVal);
+            updateStats(input, totEq, totDca, totalVal);
         }
 
-        function updateOtherStats(dca, eq, tot, currentVal) {
+        function updateStats(dca, eq, tot, currentVal) {
             document.getElementById('equityDisplay').innerText = Math.round((eq/tot)*100) + "%";
             const r = 0.0707;
             if(fireViewMode === 'rente') {
@@ -228,8 +213,11 @@
             }).join('');
         }
 
+        function toggleFireView() { fireViewMode = fireViewMode === 'rente' ? 'growth' : 'rente'; calculateAll(); }
+        function confirmDCA() { capitalBase += parseFloat(document.getElementById('dcaInput').value); calculateAll(); }
+        function resetApp() { document.getElementById('dcaInput').value = 330; calculateAll(); }
         function toggleGhost() { isGhost = !isGhost; document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('is-ghost', isGhost)); }
-        function toggleDcaView() { dcaViewMode = dcaViewMode === 'amount' ? 'perf' : 'amount'; calculateAll(); }
+        function editCapital() { const n = prompt("Capital:", capitalBase); if(n) { capitalBase = parseFloat(n); calculateAll(); } }
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
