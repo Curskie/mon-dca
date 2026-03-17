@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V6.9.6 - Fusion</title>
+    <title>Invest Pilot V6.9.7 - Platinum</title>
     
     <link rel="apple-touch-icon" href="icon.png" />
-    
     <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Invest Pilot">
@@ -23,7 +21,7 @@
         
         header { padding-top: 15px; height: 70px; }
 
-        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 24px; padding: 22px; margin-bottom: 16px; position: relative; transition: all 0.3s ease; }
+        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 24px; padding: 22px; margin-bottom: 166px; position: relative; transition: all 0.3s ease; }
         .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 15px 5px; text-transform: uppercase; flex: 1; text-align: center; }
         .nav-active { color: var(--gold); }
 
@@ -33,41 +31,40 @@
 
         .is-ghost { filter: blur(15px) !important; pointer-events: none; }
         
-        /* LOGO "FUSION SIGNATURE" IP FUSIONNÉ PLEIN (CSS DE LA PAGE) */
+        /* LOGO "PLATINUM STANDARD" IP PLEIN (CSS de la page) */
         .app-logo {
             width: 100px; height: 100px;
-            background: linear-gradient(145deg, #121212 0%, #000 100%);
+            background: linear-gradient(145deg, #101010 0%, #000 100%); /* Texture Carbone subtile */
             border: 2px solid var(--gold);
-            border-radius: 26px;
+            border-radius: 24px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.15);
             margin-bottom: 25px;
             position: relative;
         }
 
-        /* Monogramme Fusionné */
-        .logo-monogram-fusion {
-            font-size: 3.6rem;
+        /* Monogramme Plein & Espacé */
+        .logo-monogram-platinum {
+            font-size: 3.5rem;
             font-weight: 900;
             font-style: italic;
-            letter-spacing: -6px; /* Fusion rapprochée */
-            transform: skewX(-7deg); /* Plus de dynamisme */
+            letter-spacing: -1px; /* Espacement NATUREL et standard */
+            transform: skewX(-5deg); /* Dynamisme sobre */
             background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-top: -8px; /* Ajustement vertical */
-            margin-left: -5px; /* Ajustement horizontal */
+            margin-top: -6px; /* Ajustement vertical */
             filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); /* Relief */
         }
 
         .logo-text-full {
-            font-size: 7.5px;
+            font-size: 7px;
             font-weight: 800;
             text-transform: uppercase;
             color: var(--gold);
             letter-spacing: 2px;
-            margin-top: 1px;
-            opacity: 0.9;
+            margin-top: 3px;
+            opacity: 0.8;
         }
 
         .sparkline { width: 50px; height: 20px; stroke-width: 2; fill: none; }
@@ -92,7 +89,7 @@
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
         <div class="app-logo">
-            <span class="logo-monogram-fusion">IP</span>
+            <span class="logo-monogram-platinum">IP</span>
             <span class="logo-text-full">Invest Pilot</span>
         </div>
         <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-white font-black tracking-[10px] mb-4">
@@ -101,7 +98,7 @@
 
     <div id="app-content" style="display:none">
         <header class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-6">
-            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">Invest Pilot V6.9.6 Fusion</div>
+            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">Invest Pilot V6.9.7</div>
             <div class="flex gap-3">
                 <button onclick="resetApp()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">↻</button>
                 <button onclick="toggleGhost()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">👻</button>
@@ -245,7 +242,7 @@
             document.getElementById('fire-label').innerText = fireViewMode === 'rente' ? "Rente Mensuelle (4%)" : "Croissance (7.07%)";
 
             const ml = Math.round(Math.log((50000 * r/12 + dca) / (capitalBase * r/12 + dca)) / Math.log(1 + r/12));
-            document.getElementById('virement-countdown').innerText = (ml > 0 ? ml : 0) + " virements";
+            document.getElementById('virement-countdown').innerText = (ml > 0 ? ml : 0) + " virements vers 50k";
         }
 
         function toggleDcaView() { dcaViewMode = dcaViewMode === 'amount' ? 'perf' : 'amount'; calculateAll(); }
