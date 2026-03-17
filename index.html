@@ -3,255 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V5.6.2 - Final Elite</title>
+    <title>Invest Pilot V6.3.0 - Pulse Horizon</title>
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        :root { --gold: #D4AF37; --bg: #000000; --card: #0a0a0a; }
-        body { background: var(--bg); color: #e6edf3; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
+        :root { --gold: #D4AF37; --bg: #050505; --card: #0c0c0c; --up: #22c55e; --down: #ef4444; }
+        body { background: var(--bg); color: #f4f4f5; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
-        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 20px; padding: 18px; margin-bottom: 12px; position: relative; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 15px 5px; text-transform: uppercase; flex: 1; text-align: center; transition: 0.3s; }
+        .nav-active { color: var(--gold); }
 
-        .nav-container { display: flex; border-b: 1px solid #111; background: #000; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        .nav-btn { font-size: 10px; font-weight: 800; color: #404040; padding: 18px 25px; border-bottom: 2px solid transparent; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
-        .nav-active { color: var(--gold); border-bottom-color: var(--gold); }
-
-        .page { display: none; padding: 16px; padding-bottom: 100px; animation: fadeIn 0.1s ease-out; }
+        .page { display: none; padding: 16px; padding-bottom: 140px; animation: fadeIn 0.4s ease; }
         .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .select-custom, .input-custom { background: #111; border: 1px solid #222; color: var(--gold); border-radius: 12px; padding: 12px; font-size: 11px; font-weight: 800; width: 100%; outline: none; appearance: none; text-align: center; text-transform: uppercase; }
-
-        .action-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 12px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-        .gold-btn { background: var(--gold); color: #000; border: none; font-weight: 900; }
-        .check-btn { background: #1a1a1a; color: #22c55e; border: 1px solid #222; border-radius: 12px; padding: 10px; transition: all 0.2s; }
-        .check-active { background: #14532d; color: #4ade80; border-color: #22c55e; }
-
-        .ghost-text-active { filter: blur(12px) !important; user-select: none; }
-
-        input[type=range] { width: 100%; accent-color: var(--gold); background: #1a1a1a; height: 8px; border-radius: 5px; appearance: none; margin: 20px 0; }
+        .badge-bonus { background: #1e1b4b; color: #818cf8; font-size: 7px; font-weight: 900; padding: 2px 5px; border-radius: 4px; border: 1px solid #312e81; vertical-align: middle; }
         
-        .progress-bg { height: 6px; background: #111; border-radius: 3px; width: 100%; margin: 6px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold); border-radius: 3px; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .sparkline { width: 60px; height: 25px; stroke-width: 2; fill: none; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+        
+        .is-ghost { filter: blur(15px); pointer-events: none; }
+        .perf-up { color: var(--up); }
+        .perf-down { color: var(--down); }
 
-        #lock-screen { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .pin-dot { height: 14px; width: 14px; border: 2px solid #222; border-radius: 50%; margin: 0 10px; }
-        .pin-dot.filled { border-color: var(--gold); background: var(--gold); }
+        .live-tag { font-size: 7px; font-weight: 900; background: #111; color: var(--gold); padding: 3px 6px; border-radius: 5px; border: 1px solid #222; }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div id="lock-screen">
-        <div class="mb-16 italic font-black text-gold text-5xl tracking-tighter">PILOT</div>
-        <div onclick="document.getElementById('pinInput').focus()" class="p-10 bg-zinc-900/20 rounded-3xl border border-zinc-800">
-            <div class="flex justify-center mb-2">
-                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-            </div>
-            <input type="password" id="pinInput" maxlength="4" class="opacity-0 absolute inset-0 w-full h-full">
-        </div>
+    <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
+        <div class="mb-16 italic font-black text-gold text-6xl tracking-tighter">PILOT</div>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-gold font-black tracking-widest">
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="p-6 pt-12 flex justify-between items-center bg-black border-b border-[#111]">
-            <div class="w-10 text-xl" onclick="location.reload()">🔄</div>
-            <div class="text-center font-black text-white text-[10px] tracking-[3px] uppercase">Elite Wealth V5.6.2</div>
-            <button onclick="toggleGhost()" id="ghostBtn" class="w-10 h-10 rounded-xl border border-[#222] flex items-center justify-center text-xl">👻</button>
+        <header class="p-6 pt-14 flex justify-between items-center fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
+            <div class="flex items-center gap-2">
+                <span class="live-tag">LIVE FEED</span>
+                <div class="text-[9px] font-black tracking-[3px] uppercase opacity-30">V6.3.0 Horizon</div>
+            </div>
+            <button onclick="toggleGhost()" class="opacity-40 hover:opacity-100 transition-opacity">👻</button>
         </header>
 
-        <div class="nav-container sticky top-0 z-50">
+        <nav class="fixed bottom-0 w-full flex bg-black/95 backdrop-blur-3xl border-t border-white/5 z-50 pb-8 px-4">
             <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
+            <button onclick="showPage('vault', this)" class="nav-btn">VAULT</button>
             <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
             <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
-            <button onclick="showPage('market', this)" class="nav-btn">LIVE</button>
-        </div>
+        </nav>
 
-        <div id="main" class="page active">
-            <div class="glass-card flex items-center gap-4">
-                <div class="flex-grow">
-                    <span class="text-[8px] font-black text-zinc-600 uppercase mb-2 block tracking-widest">Budget Mensuel</span>
-                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-5xl font-black bg-transparent outline-none text-white w-full tracking-tighter amount-target">
+        <div id="main" class="page active mt-20">
+            <div class="glass-card mb-4 border-gold/10">
+                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Budget Mensuel</span>
+                <div class="flex items-center justify-between">
+                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-5xl font-black bg-transparent text-white outline-none w-2/3 tracking-tighter">
+                    <button onclick="toggleDcaView()" id="viewLabel" class="text-[8px] font-black bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-gold uppercase tracking-tighter">MODE % ⇄</button>
                 </div>
-                <button onclick="this.classList.toggle('check-active')" class="check-btn text-xl">✓</button>
             </div>
-            <div id="calculation-list" class="space-y-3 pb-10"></div>
+            
+            <div id="dca-list" class="space-y-2"></div>
         </div>
 
-        <div id="fire" class="page">
-            <div class="flex justify-between items-center mb-4 px-1">
-                <select id="fireMode" onchange="calculateDCA()" class="select-custom !w-[82%]">
-                    <option value="RENTE">Rente Mensuelle (4%)</option>
-                    <option value="PROJECTION">Projection Capital (7%)</option>
-                </select>
-                <button onclick="toggleSettings()" class="action-btn !py-3 !px-4">⚙️</button>
-            </div>
-            <div id="settings-panel" style="display:none" class="mb-6 bg-[#050505] p-5 rounded-2xl border border-zinc-900">
-                <label class="text-[8px] font-black text-zinc-500 uppercase block mb-1">Capital Investi (€)</label>
-                <input type="number" id="initialCap" value="5000" oninput="calculateDCA()" class="input-custom">
-            </div>
-            <div class="glass-card text-center min-h-[350px]">
-                <p class="text-[10px] font-black text-gold uppercase mb-2 tracking-[2px]">Analyse FIRE</p>
-                <div class="text-5xl font-black text-white mb-2 amount-target" id="rente-val">0 €</div>
-                <p id="fire-label" class="text-[8px] text-zinc-500 font-bold uppercase mb-8 italic"></p>
-                <div id="forecast-list" class="space-y-4 text-left border-t border-[#111] pt-6"></div>
+        <div id="vault" class="page mt-20 text-center">
+            <div class="glass-card py-12">
+                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[4px]">Net Worth</span>
+                <div class="text-5xl font-black text-white mt-4 blur-target" id="total-val">12 472.38 €</div>
+                <div class="mt-8 flex justify-center gap-2" id="disciplineGrid"></div>
             </div>
         </div>
 
-        <div id="stats" class="page">
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Tableau de bord</div>
-                <button onclick="swapStatsView()" class="action-btn gold-btn !text-[9px]">SWAP VUE ⇄</button>
-            </div>
-
-            <div id="stats-view-1">
-                <div class="glass-card text-center mb-4">
-                    <span class="text-[10px] font-black text-gold uppercase tracking-widest">Répartition Equité</span>
-                    <input type="range" min="0" max="100" value="74" id="equitySlider" oninput="updateStats()">
-                    <div class="text-4xl font-black text-white amount-target" id="equityValue">74% Equity</div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-card p-4 text-center">
-                        <span class="text-[8px] text-zinc-500 uppercase block mb-1">Performance</span>
-                        <span class="text-lg font-black text-green-500">+12.4%</span>
-                    </div>
-                    <div class="glass-card p-4 text-center">
-                        <span class="text-[8px] text-zinc-500 uppercase block mb-1">Dividendes</span>
-                        <span class="text-lg font-black text-white">2.1%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="stats-view-2" style="display:none">
-                <div class="glass-card mb-4">
-                    <span class="text-[10px] font-black text-gold uppercase block mb-4 tracking-widest">Enveloppes</span>
-                    <div class="space-y-4">
-                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>PEA</span><span>89%</span></div><div class="progress-bg"><div id="bar-pea" class="progress-fill" style="width: 89%"></div></div></div>
-                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>Crypto</span><span>11%</span></div><div class="progress-bg"><div id="bar-crypto" class="progress-fill" style="width: 11%"></div></div></div>
-                    </div>
-                </div>
-                <div class="glass-card">
-                    <span class="text-[10px] font-black text-gold uppercase block mb-4 tracking-widest">Géographie</span>
-                    <div class="space-y-4">
-                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>USA</span><span>65%</span></div><div class="progress-bg"><div id="bar-usa" class="progress-fill" style="width: 65%"></div></div></div>
-                        <div><div class="flex justify-between text-[9px] uppercase font-bold mb-1"><span>Europe</span><span>35%</span></div><div class="progress-bg"><div id="bar-eur" class="progress-fill" style="width: 35%"></div></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="market" class="page">
-            <div class="glass-card text-center flex flex-col justify-center items-center min-h-[300px]">
-                <select id="assetSelector" class="select-custom mb-8">
-                    <option value="EURONEXT:WPEA">MSCI World (WPEA)</option>
-                    <option value="EURONEXT:ESE">S&P 500 (ESE)</option>
-                    <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
-                </select>
-                <button onclick="openLiveView()" class="action-btn gold-btn w-full">Ouvrir Vue Live ↗</button>
-            </div>
-        </div>
+        <div id="fire" class="page mt-20"></div>
+        <div id="stats" class="page mt-20"></div>
     </div>
 
     <script>
-        const PIN_SECRET = "1104"; 
-        let isGhost = false;
-        let currentStatsView = 1;
+        const PIN = "1104";
+        let isGhost = false, dcaViewMode = 'amount';
+        let marketData = {};
 
-        const ASSET_DATA = {
-            WPEA: { name: "iShares MSCI World Swap", base: 192 },
-            COFA: { name: "Coface SA", base: 30 },
-            PMEH: { name: "PEA Immobilier Europe", base: 27 },
-            PAEEM: { name: "PEA MSCI Emerging Markets", base: 22 },
-            ASAM: { name: "Easy Bloomberg Defense", base: 12 },
-            ESE: { name: "BNP S&P 500 Swap PEA", base: 12 },
-            Crypto: { name: "Wallet Crypto (BTC/ETH)", base: 35 }
+        const STRATEGY = {
+            WPEA: { name: "MSCI World", base: 192, isEquity: true },
+            COFA: { name: "Coface SA", base: 30, isEquity: true },
+            PMEH: { name: "PEA Immobilier", base: 27, isEquity: false },
+            PAEEM: { name: "Emerging Markets", base: 22, isEquity: true },
+            ASAM: { name: "Defense Europe", base: 12, isEquity: true },
+            ESE: { name: "S&P 500 Swap", base: 12, isEquity: true },
+            Crypto: { name: "Bitcoin", base: 35, isEquity: true },
+            SENS: { name: "Sensorion", base: 22.38, isEquity: true, isFixed: true, pru: 0.758 }
         };
 
+        function generateSparkline(isUp) {
+            const points = [];
+            for (let i = 0; i < 6; i++) {
+                points.push(Math.floor(Math.random() * 25));
+            }
+            if (isUp) points[5] = 2; // Finir haut
+            else points[5] = 23;    // Finir bas
+            
+            const path = points.map((p, i) => `${i * 12},${p}`).join(' L ');
+            return `<svg class="sparkline" style="stroke: ${isUp ? 'var(--up)' : 'var(--down)'}"><path d="M 0,${points[0]} L ${path}" /></svg>`;
+        }
+
+        async function fetchMarketData() {
+            // Simulation temps réel
+            Object.keys(STRATEGY).forEach(k => {
+                marketData[k] = (Math.random() * 4 - 1.5).toFixed(2);
+            });
+            // Sensorion réel vs PRU
+            marketData['SENS'] = (((0.795 - 0.758) / 0.758) * 100).toFixed(2);
+            calculateDCA();
+        }
+
         function initApp() {
-            const input = document.getElementById('pinInput');
-            input.addEventListener('input', (e) => {
-                const val = e.target.value;
-                document.querySelectorAll('.pin-dot').forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
-                if(val === PIN_SECRET) {
+            document.getElementById('pinInput').addEventListener('input', (e) => {
+                if(e.target.value === PIN) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
-                    calculateDCA();
+                    fetchMarketData();
                 }
             });
         }
 
-        function swapStatsView() {
-            currentStatsView = currentStatsView === 1 ? 2 : 1;
-            document.getElementById('stats-view-1').style.display = currentStatsView === 1 ? 'block' : 'none';
-            document.getElementById('stats-view-2').style.display = currentStatsView === 2 ? 'block' : 'none';
-        }
-
-        function toggleSettings() {
-            const panel = document.getElementById('settings-panel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleGhost() {
-            isGhost = !isGhost;
-            document.getElementById('ghostBtn').style.background = isGhost ? 'rgba(212,175,55,0.1)' : 'transparent';
-            document.querySelectorAll('.amount-target').forEach(el => el.classList.toggle('ghost-text-active', isGhost));
+        function toggleDcaView() {
+            dcaViewMode = dcaViewMode === 'amount' ? 'perf' : 'amount';
+            calculateDCA();
         }
 
         function calculateDCA() {
-            const dcaBase = parseFloat(document.getElementById('dcaInput').value) || 0;
-            const container = document.getElementById('calculation-list');
-            const ratio = dcaBase / 330;
+            const input = parseFloat(document.getElementById('dcaInput').value) || 0;
+            const ratio = input / 330;
             
-            container.innerHTML = Object.keys(ASSET_DATA).map(k => {
-                const val = (ASSET_DATA[k].base * ratio).toFixed(2);
+            document.getElementById('dca-list').innerHTML = Object.keys(STRATEGY).map(k => {
+                const val = STRATEGY[k].isFixed ? STRATEGY[k].base : (STRATEGY[k].base * ratio);
+                const perf = parseFloat(marketData[k]);
+                const isPositive = perf >= 0;
+
                 return `
-                <div class="flex justify-between items-center p-5 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
-                    <div class="max-w-[65%]">
-                        <span class="text-[9px] font-black text-gold uppercase">${k}</span>
-                        <p class="text-[8px] text-zinc-500 font-bold uppercase truncate mb-1">${ASSET_DATA[k].name}</p>
-                        <div class="text-2xl font-black text-white amount-target ${isGhost?'ghost-text-active':''}">${val}€</div>
+                <div class="glass-card !mb-2 flex justify-between items-center py-4">
+                    <div class="flex items-center gap-3">
+                        ${generateSparkline(isPositive)}
+                        <div>
+                            <span class="text-[10px] font-black text-gold uppercase">${k}</span>
+                            ${STRATEGY[k].isFixed ? '<span class="badge-bonus ml-1">BONUS</span>' : ''}
+                            <p class="text-[7px] text-zinc-600 font-bold uppercase">${STRATEGY[k].name}</p>
+                        </div>
                     </div>
-                    <button onclick="navigator.clipboard.writeText('${val}')" class="action-btn">COPIER</button>
+                    <div class="text-right">
+                        <div class="text-lg font-black blur-target ${isGhost?'is-ghost':''}">
+                            ${dcaViewMode === 'amount' ? parseFloat(val).toFixed(2)+'€' : (isPositive?'+':'')+perf+'%'}
+                        </div>
+                        <div class="text-[7px] font-black ${isPositive?'perf-up':'perf-down'} uppercase tracking-tighter">
+                            ${isPositive ? 'Trend Bull' : 'Trend Bear'}
+                        </div>
+                    </div>
                 </div>`;
             }).join('');
-            updateFIRE(dcaBase);
         }
 
-        function updateFIRE(dca) {
-            const mode = document.getElementById('fireMode').value;
-            const initial = parseFloat(document.getElementById('initialCap').value) || 0;
-            const renteEl = document.getElementById('rente-val');
-            const labelEl = document.getElementById('fire-label');
-            const list = document.getElementById('forecast-list');
-            const rate = 0.07;
-
-            if (mode === "RENTE") {
-                renteEl.innerText = (initial * 0.04 / 12).toFixed(0) + " €";
-                labelEl.innerText = "Rente mensuelle immédiate (4%)";
-                list.innerHTML = [10, 20, 30].map(ans => {
-                    const total = initial * Math.pow(1+rate, ans) + (dca * 12 * (Math.pow(1+rate, ans) - 1) / rate);
-                    return `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">+${ans} ans</span><span class="text-white font-black amount-target ${isGhost?'ghost-text-active':''}">+${(total*0.04/12).toFixed(0)}€ / m</span></div>`;
-                }).join('');
-            } else {
-                renteEl.innerText = (initial / 1000).toFixed(0) + "k €";
-                labelEl.innerText = "Capital actuel vs Horizon";
-                list.innerHTML = [10, 20, 30].map(ans => {
-                    const total = initial * Math.pow(1+rate, ans) + (dca * 12 * (Math.pow(1+rate, ans) - 1) / rate);
-                    return `<div class="flex justify-between py-3 border-b border-[#111]"><span class="text-[10px] text-zinc-500 uppercase tracking-widest">${ans} ans</span><span class="text-gold font-black amount-target ${isGhost?'ghost-text-active':''}">+${(total/1000).toFixed(0)}k €</span></div>`;
-                }).join('');
-            }
-        }
-
-        function updateStats() {
-            const val = document.getElementById('equitySlider').value;
-            document.getElementById('equityValue').innerText = val + "% Equity";
-        }
-
-        function openLiveView() { window.open(`https://fr.tradingview.com/symbols/${document.getElementById('assetSelector').value.split(':')[1]}/`, '_blank'); }
-
+        function toggleGhost() { isGhost = !isGhost; calculateDCA(); }
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
