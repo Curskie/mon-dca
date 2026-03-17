@@ -3,65 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V7.0.1 - Aero Horizon</title>
+    <title>Invest Pilot V7.1 - Aero Full-Restore</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        :root { --gold: #D4AF37; --bg: #050505; --card: #0c0c0c; }
+        :root { --gold: #D4AF37; --bg: #050505; --card: #0c0c0c; --up: #22c55e; --down: #ef4444; }
         body { background: var(--bg); color: #f4f4f5; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow: hidden; }
         
-        /* LOGO AERO HORIZON VALIDÉ */
+        /* LOGO AERO HORIZON */
         .aero-logo {
-            width: 90px; height: 90px;
+            width: 85px; height: 85px;
             background: radial-gradient(circle at center, #111 0%, #000 100%);
             border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50%;
+            border-radius: 28%; /* Forme squircle comme tes captures */
             display: flex; align-items: center; justify-content: center;
-            position: relative; margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
         }
         .aero-needle {
-            width: 4px; height: 40px;
+            width: 4px; height: 35px;
             background: linear-gradient(to top, transparent, var(--gold));
             border-radius: 2px;
             transform: rotate(45deg);
             filter: drop-shadow(0 0 5px var(--gold));
         }
 
-        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 24px; padding: 22px; margin-bottom: 16px; position: relative; }
-        .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 20px 5px; text-transform: uppercase; flex: 1; text-align: center; transition: 0.2s; }
-        .nav-active { color: var(--gold); }
+        .glass-card { background: var(--card); border: 1px solid #161616; border-radius: 28px; padding: 20px; margin-bottom: 12px; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 18px 5px; text-transform: uppercase; flex: 1; text-align: center; }
+        .nav-active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
-        .page { display: none; padding: 16px; padding-bottom: 140px; height: 100vh; overflow-y: auto; }
+        .page { display: none; padding: 16px; padding-bottom: 120px; height: 100vh; overflow-y: auto; animation: fadeIn 0.2s ease; }
         .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .is-ghost { filter: blur(12px) !important; pointer-events: none; }
+        .is-ghost { filter: blur(15px) !important; pointer-events: none; }
         
-        .progress-bar { background: #111; height: 10px; border-radius: 99px; overflow: hidden; margin-top: 10px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #996515, var(--gold)); transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .progress-bar { background: #111; height: 10px; border-radius: 99px; overflow: hidden; margin-top: 12px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #996515, var(--gold)); transition: width 1s ease; }
+
+        /* Sparkline Simulation */
+        .sparkline { width: 50px; height: 25px; stroke-width: 2; fill: none; }
     </style>
 </head>
 <body onload="initApp()">
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
         <div class="aero-logo"><div class="aero-needle"></div></div>
-        <h1 class="text-white font-black tracking-[4px] uppercase text-xl mb-10">Invest Pilot</h1>
+        <h1 class="text-white font-black tracking-[3px] uppercase text-lg mb-8">Invest Pilot</h1>
         <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-white font-black tracking-[10px] mb-4">
-        <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Identification</p>
+        <p class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Identification Sécurisée</p>
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-6 h-[70px]">
-            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40">Aero Horizon V7.0.1</div>
-            <div class="flex gap-3">
-                <button onclick="resetApp()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">↻</button>
-                <button onclick="toggleGhost()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">👻</button>
+        <header class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 flex justify-between items-center px-6 h-[65px]">
+            <div class="text-[10px] font-black tracking-[2px] uppercase opacity-50">Aero Horizon V7.1</div>
+            <div class="flex gap-4">
+                <button onclick="resetApp()" class="opacity-40">↻</button>
+                <button onclick="toggleGhost()" class="text-xl">👻</button>
             </div>
         </header>
 
-        <nav class="fixed bottom-0 w-full flex bg-black/95 border-t border-white/5 z-50 pb-8 px-4">
+        <nav class="fixed bottom-0 w-full flex bg-black border-t border-white/5 z-50 pb-8 px-4">
             <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
             <button onclick="showPage('vault', this)" class="nav-btn">Vault</button>
             <button onclick="showPage('fire', this)" class="nav-btn">Fire</button>
@@ -69,53 +73,55 @@
         </nav>
 
         <div id="main" class="page active mt-20">
-            <div class="glass-card">
-                <span class="text-[9px] font-black text-zinc-500 uppercase block mb-1">Injection Mensuelle</span>
-                <div class="flex items-center gap-4">
-                    <input type="number" id="dcaInput" value="330" oninput="calculateAll()" class="text-5xl font-black bg-transparent text-white outline-none w-full tracking-tighter">
-                    <button onclick="confirmDCA()" class="bg-gold text-black px-5 py-2 rounded-xl font-bold active:scale-95">✓</button>
+            <div class="glass-card mb-6">
+                <span class="text-[10px] font-black text-zinc-500 uppercase block mb-1">DCA Mensuel</span>
+                <div class="flex items-center justify-between">
+                    <input type="number" id="dcaInput" value="330" oninput="calculateAll()" class="text-6xl font-black bg-transparent text-white outline-none w-2/3 tracking-tighter">
+                    <span class="text-zinc-700 text-2xl font-bold">✓</span>
                 </div>
             </div>
-            <div id="dca-list" class="space-y-2"></div>
+            <div id="dca-list" class="space-y-3"></div>
         </div>
 
         <div id="vault" class="page mt-20">
             <div class="glass-card text-center py-12">
-                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Net Worth Actuel</span>
-                <div class="text-5xl font-black text-white mt-3 blur-target" id="total-val">-- €</div>
+                <span class="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Net Worth</span>
+                <div class="text-5xl font-black text-white mt-4 blur-target" id="total-val">12 472,38 €</div>
             </div>
             <div class="glass-card">
-                <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-black uppercase text-zinc-400">Objectif 50k</span>
-                    <span class="text-gold font-black blur-target" id="success-pct">0%</span>
+                <div class="flex justify-between items-center font-black uppercase text-[10px]">
+                    <span class="text-zinc-500">Objectif 50k</span>
+                    <span class="text-white blur-target" id="success-pct">25%</span>
                 </div>
-                <div class="progress-bar"><div id="success-bar" class="progress-fill" style="width: 0%"></div></div>
+                <div class="progress-bar"><div id="success-bar" class="progress-fill" style="width: 25%"></div></div>
             </div>
         </div>
 
-        <div id="fire" class="page mt-20">
-            <div class="glass-card text-center py-12">
-                <div class="text-6xl font-black text-white blur-target" id="fire-val">0 €</div>
-                <p class="text-[10px] text-zinc-500 font-bold uppercase mt-3 tracking-widest">Rente Mensuelle (4%)</p>
-                <div class="mt-10 p-5 bg-zinc-900/50 border border-zinc-800 rounded-3xl inline-block">
-                    <span class="text-[12px] font-black text-gold uppercase tracking-tight" id="virement-countdown">-- virements vers 50k</span>
+        <div id="fire" class="page mt-20 text-center">
+            <div class="glass-card py-12">
+                <div class="text-6xl font-black text-white blur-target" id="fire-val">42 €</div>
+                <p class="text-[10px] text-zinc-500 font-bold uppercase mt-4 tracking-widest">Rente Mensuelle (4%)</p>
+                
+                <div class="mt-12 bg-zinc-900/40 border border-zinc-800 rounded-2xl p-6 mx-4">
+                    <span class="text-[13px] font-black text-white uppercase tracking-tight blur-target" id="virement-countdown">114 virements vers 50k</span>
                 </div>
             </div>
         </div>
 
         <div id="stats" class="page mt-20">
             <div class="glass-card">
-                <span class="text-[10px] font-black text-gold uppercase block mb-4">Risque Equity</span>
+                <span class="text-[11px] font-black text-white uppercase block mb-6">Exposition Equity</span>
                 <div class="flex justify-between items-end">
-                    <div class="text-5xl font-black text-white blur-target">92%</div>
-                    <span class="text-[9px] font-black text-zinc-500 uppercase">Exposition</span>
+                    <div class="text-6xl font-black text-white blur-target">92%</div>
+                    <span class="text-[10px] font-black text-zinc-600 uppercase mb-2">Risque</span>
                 </div>
             </div>
             <div class="glass-card">
-                <span class="text-[10px] font-black text-gold uppercase block mb-4">Répartition Enveloppes</span>
-                <div class="flex justify-between text-xs font-black">
-                    <div class="flex flex-col">PEA <span class="text-white text-xl">89%</span></div>
-                    <div class="flex flex-col text-right">Crypto <span class="text-white text-xl">11%</span></div>
+                <span class="text-[11px] font-black text-white uppercase block mb-6">Zones Géo</span>
+                <div class="space-y-4 text-[12px] font-bold uppercase">
+                    <div class="flex justify-between"><span>États-Unis</span><span class="text-white">65%</span></div>
+                    <div class="flex justify-between"><span>Europe</span><span class="text-white">25%</span></div>
+                    <div class="flex justify-between"><span>Emerging</span><span class="text-white">10%</span></div>
                 </div>
             </div>
         </div>
@@ -126,26 +132,21 @@
         let isGhost = false;
         let capitalBase = 12472.38;
 
-        // Ta stratégie officielle
         const STRATEGY = [
-            { id: 'WPEA', name: 'MSCI World', base: 192 },
-            { id: 'COFA', name: 'Coface SA', base: 30 },
-            { id: 'PMEH', name: 'PEA Immobilier', base: 27 },
-            { id: 'PAEEM', name: 'Emerging Markets', base: 22 },
-            { id: 'ASAM', name: 'Defense Europe', base: 12 },
-            { id: 'ESE', name: 'S&P 500 Swap', base: 12 },
-            { id: 'BTC', name: 'Bitcoin (Crypto)', base: 35 }
+            { id: 'WPEA', name: 'MSCI World', base: 192, trend: 'down' },
+            { id: 'COFA', name: 'Coface SA', base: 30, trend: 'up' },
+            { id: 'PMEH', name: 'PEA Immobilier', base: 27, trend: 'down' },
+            { id: 'PAEEM', name: 'Emerging Markets', base: 22, trend: 'up' },
+            { id: 'ASAM', name: 'Defense Europe', base: 12, trend: 'down' },
+            { id: 'ESE', name: 'S&P 500 Swap', base: 12, trend: 'down' }
         ];
 
         function initApp() {
             document.getElementById('pinInput').addEventListener('input', (e) => {
                 if(e.target.value === PIN) {
-                    document.getElementById('lock-screen').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('lock-screen').style.display = 'none';
-                        document.getElementById('app-content').style.display = 'block';
-                        calculateAll();
-                    }, 300);
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'block';
+                    calculateAll();
                 }
             });
         }
@@ -154,51 +155,40 @@
             const input = parseFloat(document.getElementById('dcaInput').value) || 0;
             const ratio = input / 330;
             
-            // 1. Update DCA List
-            document.getElementById('dca-list').innerHTML = STRATEGY.map(asset => {
-                const val = (asset.base * ratio).toFixed(2);
-                return `<div class="glass-card !py-5 flex justify-between items-center">
-                    <div>
-                        <span class="text-xs font-black text-gold uppercase tracking-wider">${asset.id}</span>
-                        <p class="text-[8px] text-zinc-600 font-bold uppercase">${asset.name}</p>
+            document.getElementById('dca-list').innerHTML = STRATEGY.map(s => {
+                const val = (s.base * ratio).toFixed(2);
+                const color = s.trend === 'up' ? 'text-green-500' : 'text-red-500';
+                const sign = s.trend === 'up' ? '+' : '-';
+                const pct = (Math.random() * 2).toFixed(2);
+
+                return `<div class="glass-card !py-6 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <svg class="sparkline stroke-${s.trend==='up'?'green':'red'}-500" viewBox="0 0 50 25">
+                            <polyline points="${s.trend==='up'?'0,20 15,10 30,15 50,5':'0,5 15,15 30,10 50,20'}" />
+                        </svg>
+                        <div>
+                            <span class="text-[13px] font-black text-white">${s.id}</span>
+                            <p class="text-[8px] text-zinc-600 font-bold uppercase">${s.name}</p>
+                        </div>
                     </div>
-                    <div class="text-xl font-black blur-target ${isGhost?'is-ghost':''}">${val} €</div>
+                    <div class="text-right">
+                        <div class="text-xl font-black blur-target ${isGhost?'is-ghost':''}">${val} €</div>
+                        <div class="text-[9px] font-bold ${color}">${sign}${pct}%</div>
+                    </div>
                 </div>`;
             }).join('');
 
-            // 2. Update Vault & Progress
-            const goal = 50000;
-            const pct = Math.min((capitalBase / goal) * 100, 100);
-            document.getElementById('total-val').innerText = capitalBase.toLocaleString('fr-FR', {minimumFractionDigits: 2}) + " €";
-            document.getElementById('success-pct').innerText = Math.round(pct) + "%";
+            const pct = Math.round((capitalBase / 50000) * 100);
+            document.getElementById('success-pct').innerText = pct + "%";
             document.getElementById('success-bar').style.width = pct + "%";
-
-            // 3. Update Fire calculations
-            const monthlyRente = (capitalBase * 0.04) / 12;
-            document.getElementById('fire-val').innerText = Math.round(monthlyRente) + " €";
+            document.getElementById('fire-val').innerText = Math.round((capitalBase * 0.04) / 12) + " €";
             
-            const remaining = goal - capitalBase;
-            const monthlySavings = input || 1;
-            const monthsLeft = Math.max(0, Math.ceil(remaining / monthlySavings));
-            document.getElementById('virement-countdown').innerText = monthsLeft + " virements vers 50k";
+            const left = Math.ceil((50000 - capitalBase) / (input || 1));
+            document.getElementById('virement-countdown').innerText = left + " virements vers 50k";
         }
 
-        function toggleGhost() { 
-            isGhost = !isGhost; 
-            document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('is-ghost', isGhost)); 
-        }
-
-        function confirmDCA() { 
-            capitalBase += parseFloat(document.getElementById('dcaInput').value) || 0; 
-            calculateAll(); 
-            alert("Capital mis à jour !");
-        }
-
-        function resetApp() { 
-            document.getElementById('dcaInput').value = 330; 
-            calculateAll(); 
-        }
-
+        function toggleGhost() { isGhost = !isGhost; document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('is-ghost', isGhost)); }
+        function resetApp() { document.getElementById('dcaInput').value = 330; calculateAll(); }
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
