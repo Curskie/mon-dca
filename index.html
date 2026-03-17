@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V6.9.5</title>
+    <title>Invest Pilot V6.9.6 - Fusion</title>
     
     <link rel="apple-touch-icon" href="icon.png" />
     
@@ -33,38 +33,41 @@
 
         .is-ghost { filter: blur(15px) !important; pointer-events: none; }
         
-        /* LOGO "GOLD STANDARD" IP PLEIN AVEC NOM COMPLET (CSS DE LA PAGE) */
+        /* LOGO "FUSION SIGNATURE" IP FUSIONNÉ PLEIN (CSS DE LA PAGE) */
         .app-logo {
-            width: 95px; height: 95px;
+            width: 100px; height: 100px;
             background: linear-gradient(145deg, #121212 0%, #000 100%);
             border: 2px solid var(--gold);
-            border-radius: 24px;
+            border-radius: 26px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.15);
             margin-bottom: 25px;
             position: relative;
         }
 
-        .logo-text-monogram {
-            font-size: 3.2rem;
+        /* Monogramme Fusionné */
+        .logo-monogram-fusion {
+            font-size: 3.6rem;
             font-weight: 900;
             font-style: italic;
-            letter-spacing: -4px;
-            transform: skewX(-6deg);
+            letter-spacing: -6px; /* Fusion rapprochée */
+            transform: skewX(-7deg); /* Plus de dynamisme */
             background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-top: -5px; /* Ajustement vertical */
+            margin-top: -8px; /* Ajustement vertical */
+            margin-left: -5px; /* Ajustement horizontal */
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); /* Relief */
         }
 
         .logo-text-full {
-            font-size: 7px;
+            font-size: 7.5px;
             font-weight: 800;
             text-transform: uppercase;
             color: var(--gold);
             letter-spacing: 2px;
-            margin-top: 2px;
-            opacity: 0.8;
+            margin-top: 1px;
+            opacity: 0.9;
         }
 
         .sparkline { width: 50px; height: 20px; stroke-width: 2; fill: none; }
@@ -89,7 +92,7 @@
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
         <div class="app-logo">
-            <span class="logo-text-monogram">IP</span>
+            <span class="logo-monogram-fusion">IP</span>
             <span class="logo-text-full">Invest Pilot</span>
         </div>
         <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-white font-black tracking-[10px] mb-4">
@@ -98,7 +101,7 @@
 
     <div id="app-content" style="display:none">
         <header class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-6">
-            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">Invest Pilot V6.9.5</div>
+            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-40 text-gold">Invest Pilot V6.9.6 Fusion</div>
             <div class="flex gap-3">
                 <button onclick="resetApp()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">↻</button>
                 <button onclick="toggleGhost()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-sm">👻</button>
