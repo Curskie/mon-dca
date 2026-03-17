@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V6.3.0 - Pulse Horizon</title>
+    <title>Invest Pilot V6.4.0 - Full Integration</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,75 +12,104 @@
         :root { --gold: #D4AF37; --bg: #050505; --card: #0c0c0c; --up: #22c55e; --down: #ef4444; }
         body { background: var(--bg); color: #f4f4f5; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow-x: hidden; }
         
-        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 20px; padding: 18px; margin-bottom: 12px; position: relative; }
-        .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 15px 5px; text-transform: uppercase; flex: 1; text-align: center; transition: 0.3s; }
+        .glass-card { background: var(--card); border: 1px solid #1a1a1a; border-radius: 24px; padding: 22px; margin-bottom: 16px; position: relative; }
+        .nav-btn { font-size: 10px; font-weight: 800; color: #444; padding: 15px 5px; text-transform: uppercase; flex: 1; text-align: center; }
         .nav-active { color: var(--gold); }
 
-        .page { display: none; padding: 16px; padding-bottom: 140px; animation: fadeIn 0.4s ease; }
+        .page { display: none; padding: 16px; padding-bottom: 140px; animation: fadeIn 0.3s ease; }
         .active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .badge-bonus { background: #1e1b4b; color: #818cf8; font-size: 7px; font-weight: 900; padding: 2px 5px; border-radius: 4px; border: 1px solid #312e81; vertical-align: middle; }
+        .is-ghost { filter: blur(15px) !important; pointer-events: none; }
+        .sparkline { width: 50px; height: 20px; stroke-width: 2; fill: none; }
         
-        .sparkline { width: 60px; height: 25px; stroke-width: 2; fill: none; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
-        
-        .is-ghost { filter: blur(15px); pointer-events: none; }
-        .perf-up { color: var(--up); }
-        .perf-down { color: var(--down); }
-
-        .live-tag { font-size: 7px; font-weight: 900; background: #111; color: var(--gold); padding: 3px 6px; border-radius: 5px; border: 1px solid #222; }
+        .badge-bonus { background: #1e1b4b; color: #818cf8; font-size: 7px; font-weight: 900; padding: 2px 6px; border-radius: 4px; border: 1px solid #312e81; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body onload="initApp()">
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
-        <div class="mb-16 italic font-black text-gold text-6xl tracking-tighter">PILOT</div>
-        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-gold font-black tracking-widest">
+        <div class="mb-16 italic font-black text-gold text-6xl tracking-tighter uppercase">Pilot</div>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent border-b border-zinc-800 text-center text-4xl w-full outline-none text-gold font-black tracking-[10px]">
     </div>
 
     <div id="app-content" style="display:none">
         <header class="p-6 pt-14 flex justify-between items-center fixed top-0 w-full z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
-            <div class="flex items-center gap-2">
-                <span class="live-tag">LIVE FEED</span>
-                <div class="text-[9px] font-black tracking-[3px] uppercase opacity-30">V6.3.0 Horizon</div>
-            </div>
-            <button onclick="toggleGhost()" class="opacity-40 hover:opacity-100 transition-opacity">👻</button>
+            <div class="text-[9px] font-black tracking-[3px] uppercase opacity-30 text-gold">V6.4.0 Full</div>
+            <button onclick="toggleGhost()" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-lg">👻</button>
         </header>
 
         <nav class="fixed bottom-0 w-full flex bg-black/95 backdrop-blur-3xl border-t border-white/5 z-50 pb-8 px-4">
             <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
-            <button onclick="showPage('vault', this)" class="nav-btn">VAULT</button>
-            <button onclick="showPage('fire', this)" class="nav-btn">FIRE</button>
-            <button onclick="showPage('stats', this)" class="nav-btn">STATS</button>
+            <button onclick="showPage('vault', this)" class="nav-btn">Vault</button>
+            <button onclick="showPage('fire', this)" class="nav-btn">Fire</button>
+            <button onclick="showPage('stats', this)" class="nav-btn">Stats</button>
         </nav>
 
         <div id="main" class="page active mt-20">
-            <div class="glass-card mb-4 border-gold/10">
-                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Budget Mensuel</span>
-                <div class="flex items-center justify-between">
-                    <input type="number" id="dcaInput" value="330" oninput="calculateDCA()" class="text-5xl font-black bg-transparent text-white outline-none w-2/3 tracking-tighter">
-                    <button onclick="toggleDcaView()" id="viewLabel" class="text-[8px] font-black bg-zinc-900 border border-zinc-800 px-3 py-2 rounded-lg text-gold uppercase tracking-tighter">MODE % ⇄</button>
+            <div class="glass-card flex items-center gap-4 border-gold/10">
+                <div class="flex-grow">
+                    <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1">Injection DCA</span>
+                    <input type="number" id="dcaInput" value="330" oninput="calculateAll()" class="text-5xl font-black bg-transparent text-white outline-none w-full tracking-tighter">
                 </div>
+                <button onclick="confirmDCA(this)" class="bg-gold text-black w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold transition-transform active:scale-90">✓</button>
             </div>
-            
+            <div class="flex justify-end mb-4">
+                <button onclick="toggleDcaView()" id="viewLabel" class="text-[8px] font-black bg-zinc-950 border border-zinc-900 px-3 py-2 rounded-lg text-gold uppercase">Mode % ⇄</button>
+            </div>
             <div id="dca-list" class="space-y-2"></div>
         </div>
 
-        <div id="vault" class="page mt-20 text-center">
-            <div class="glass-card py-12">
-                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[4px]">Net Worth</span>
-                <div class="text-5xl font-black text-white mt-4 blur-target" id="total-val">12 472.38 €</div>
+        <div id="vault" class="page mt-20">
+            <div class="glass-card text-center py-12 relative">
+                <button onclick="editCapital()" class="absolute top-4 right-4 text-zinc-700 hover:text-gold transition-colors text-lg">⚙️</button>
+                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[4px]">Net Worth Actualisé</span>
+                <div class="text-4xl font-black text-white mt-4 blur-target" id="total-val">-- €</div>
                 <div class="mt-8 flex justify-center gap-2" id="disciplineGrid"></div>
+            </div>
+            <div class="glass-card">
+                <span class="text-[9px] font-black text-zinc-500 uppercase block mb-3">Progression 50k</span>
+                <div class="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
+                    <div class="h-full bg-gold transition-all duration-1000" id="success-bar" style="width:0%"></div>
+                </div>
+                <div class="mt-2 text-[10px] font-black text-zinc-500 text-right uppercase" id="success-pct">0%</div>
             </div>
         </div>
 
-        <div id="fire" class="page mt-20"></div>
-        <div id="stats" class="page mt-20"></div>
+        <div id="fire" class="page mt-20">
+            <div class="glass-card text-center py-10">
+                <div class="text-6xl font-black text-white blur-target" id="rente-val">0 €</div>
+                <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-2 mb-8">Rente Mensuelle (4%)</p>
+                <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-900 inline-block px-8">
+                    <span class="text-[11px] font-black text-gold uppercase tracking-tighter" id="virement-countdown">-- virements vers 50k</span>
+                </div>
+                <div id="forecast-list" class="mt-8 space-y-4 text-left border-t border-zinc-900 pt-6"></div>
+            </div>
+        </div>
+
+        <div id="stats" class="page mt-20">
+            <div class="glass-card">
+                <span class="text-[10px] font-black text-gold uppercase tracking-[2px] block mb-6">Allocation Equity</span>
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div class="text-5xl font-black text-white blur-target" id="equityDisplay">0%</div>
+                        <span class="text-[9px] font-black text-zinc-500 uppercase">Exposition Risque</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-black text-gold blur-target" id="simYield">0%</div>
+                        <span class="text-[9px] font-black text-zinc-500 uppercase">Rendement Prévu</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const PIN = "1104";
         let isGhost = false, dcaViewMode = 'amount';
+        let capitalBase = 12472.38;
+        let monthsDone = [0, 1, 2];
         let marketData = {};
 
         const STRATEGY = {
@@ -94,56 +123,50 @@
             SENS: { name: "Sensorion", base: 22.38, isEquity: true, isFixed: true, pru: 0.758 }
         };
 
-        function generateSparkline(isUp) {
-            const points = [];
-            for (let i = 0; i < 6; i++) {
-                points.push(Math.floor(Math.random() * 25));
-            }
-            if (isUp) points[5] = 2; // Finir haut
-            else points[5] = 23;    // Finir bas
-            
-            const path = points.map((p, i) => `${i * 12},${p}`).join(' L ');
-            return `<svg class="sparkline" style="stroke: ${isUp ? 'var(--up)' : 'var(--down)'}"><path d="M 0,${points[0]} L ${path}" /></svg>`;
-        }
-
-        async function fetchMarketData() {
-            // Simulation temps réel
-            Object.keys(STRATEGY).forEach(k => {
-                marketData[k] = (Math.random() * 4 - 1.5).toFixed(2);
-            });
-            // Sensorion réel vs PRU
-            marketData['SENS'] = (((0.795 - 0.758) / 0.758) * 100).toFixed(2);
-            calculateDCA();
-        }
-
         function initApp() {
             document.getElementById('pinInput').addEventListener('input', (e) => {
                 if(e.target.value === PIN) {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
                     fetchMarketData();
+                    renderHeatmap();
                 }
             });
         }
 
-        function toggleDcaView() {
-            dcaViewMode = dcaViewMode === 'amount' ? 'perf' : 'amount';
-            calculateDCA();
+        function editCapital() {
+            const newVal = prompt("Nouveau capital de base (€):", capitalBase);
+            if (newVal !== null) { capitalBase = parseFloat(newVal); calculateAll(); }
         }
 
-        function calculateDCA() {
+        function confirmDCA(btn) {
+            const dca = parseFloat(document.getElementById('dcaInput').value) || 0;
+            capitalBase += dca;
+            btn.classList.add('bg-white', 'scale-95');
+            setTimeout(() => { btn.classList.remove('bg-white', 'scale-95'); calculateAll(); }, 200);
+        }
+
+        async function fetchMarketData() {
+            Object.keys(STRATEGY).forEach(k => { marketData[k] = (Math.random() * 4 - 1.5).toFixed(2); });
+            marketData['SENS'] = (((0.792 - 0.758) / 0.758) * 100).toFixed(2);
+            calculateAll();
+        }
+
+        function calculateAll() {
             const input = parseFloat(document.getElementById('dcaInput').value) || 0;
             const ratio = input / 330;
-            
+            let totalEq = 0, totalDCA = 0;
+
             document.getElementById('dca-list').innerHTML = Object.keys(STRATEGY).map(k => {
                 const val = STRATEGY[k].isFixed ? STRATEGY[k].base : (STRATEGY[k].base * ratio);
-                const perf = parseFloat(marketData[k]);
-                const isPositive = perf >= 0;
+                totalDCA += parseFloat(val);
+                if(STRATEGY[k].isEquity) totalEq += parseFloat(val);
+                const isPos = parseFloat(marketData[k]) >= 0;
 
                 return `
                 <div class="glass-card !mb-2 flex justify-between items-center py-4">
                     <div class="flex items-center gap-3">
-                        ${generateSparkline(isPositive)}
+                        <svg class="sparkline" style="stroke: ${isPos ? 'var(--up)' : 'var(--down)'}"><path d="M 0,${isPos?15:5} L 10,${isPos?10:15} L 20,${isPos?18:8} L 30,${isPos?5:20} L 40,${isPos?12:5} L 50,${isPos?2:18}" /></svg>
                         <div>
                             <span class="text-[10px] font-black text-gold uppercase">${k}</span>
                             ${STRATEGY[k].isFixed ? '<span class="badge-bonus ml-1">BONUS</span>' : ''}
@@ -152,17 +175,47 @@
                     </div>
                     <div class="text-right">
                         <div class="text-lg font-black blur-target ${isGhost?'is-ghost':''}">
-                            ${dcaViewMode === 'amount' ? parseFloat(val).toFixed(2)+'€' : (isPositive?'+':'')+perf+'%'}
-                        </div>
-                        <div class="text-[7px] font-black ${isPositive?'perf-up':'perf-down'} uppercase tracking-tighter">
-                            ${isPositive ? 'Trend Bull' : 'Trend Bear'}
+                            ${dcaViewMode === 'amount' ? parseFloat(val).toFixed(2)+'€' : (isPos?'+':'')+marketData[k]+'%'}
                         </div>
                     </div>
                 </div>`;
             }).join('');
+
+            updateDisplays(input, totalEq, totalDCA);
         }
 
-        function toggleGhost() { isGhost = !isGhost; calculateDCA(); }
+        function updateDisplays(dca, eq, tot) {
+            const totalVal = capitalBase;
+            document.getElementById('total-val').innerText = totalVal.toLocaleString('fr-FR') + " €";
+            
+            const prog = Math.min((totalVal / 50000) * 100, 100);
+            document.getElementById('success-bar').style.width = prog + "%";
+            document.getElementById('success-pct').innerText = Math.round(prog) + "%";
+
+            const yield = 7.07;
+            document.getElementById('equityDisplay').innerText = Math.round((eq/tot)*100) + "%";
+            document.getElementById('simYield').innerText = yield + "%";
+            document.getElementById('rente-val').innerText = Math.round(totalVal * 0.04 / 12) + " €";
+
+            const r = yield / 100;
+            const ml = Math.round(Math.log((50000 * r/12 + dca) / (totalVal * r/12 + dca)) / Math.log(1 + r/12));
+            document.getElementById('virement-countdown').innerText = (ml > 0 ? ml : 0) + " virements vers 50k";
+
+            document.getElementById('forecast-list').innerHTML = [5, 10, 20].map(a => {
+                const t = totalVal * Math.pow(1+r, a) + (dca * 12 * (Math.pow(1+r, a) - 1) / r);
+                return `<div class="flex justify-between py-3 border-b border-zinc-900"><span class="text-[9px] font-black text-zinc-500 uppercase">${a} ANS</span><span class="font-black blur-target ${isGhost?'is-ghost':''}">${(t/1000).toFixed(1)}k €</span></div>`;
+            }).join('');
+        }
+
+        function renderHeatmap() {
+            const m = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+            document.getElementById('disciplineGrid').innerHTML = m.map((l, i) => `
+                <div class="w-6 h-6 rounded flex items-center justify-center text-[8px] font-black ${monthsDone.includes(i) ? 'bg-gold text-black' : 'bg-zinc-900 text-zinc-700'}">${l}</div>
+            `).join('');
+        }
+
+        function toggleGhost() { isGhost = !isGhost; document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('is-ghost', isGhost)); calculateAll(); }
+        function toggleDcaView() { dcaViewMode = dcaViewMode === 'amount' ? 'perf' : 'amount'; calculateAll(); }
         function showPage(id, btn) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
