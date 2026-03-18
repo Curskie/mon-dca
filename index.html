@@ -3,338 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invest Pilot V8.0 - Master Engine</title>
-    
+    <title>Invest Pilot V9.0 - OVERDRIVE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
-        :root { 
-            --gold: #D4AF37; 
-            --bg: #030303; 
-            --card: rgba(24, 24, 27, 0.9); 
-            --up: #22c55e; 
-            --down: #ef4444; 
-        }
+        :root { --gold: #D4AF37; --bg: #030303; --card: rgba(26, 26, 30, 0.95); }
+        body { background: var(--bg); color: #f4f4f5; font-family: 'Inter', sans-serif; margin: 0; padding-top: env(safe-area-inset-top); overflow: hidden; font-size: 13px; -webkit-font-smoothing: antialiased; }
+        .bg-quantum { position: fixed; inset: 0; background: radial-gradient(circle at 50% -10%, #1f1f1f 0%, #030303 100%); z-index: -1; }
+        .glass-card { background: var(--card); backdrop-filter: blur(40px); border: 1px solid rgba(255,255,255,0.04); border-radius: 26px; padding: 22px; margin-bottom: 14px; position: relative; }
+        .nav-btn { font-size: 9px; font-weight: 900; color: #444; flex: 1; text-align: center; text-transform: uppercase; padding: 22px 0; }
+        .nav-active { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        .page { display: none; padding: 15px; padding-bottom: 150px; height: 100vh; overflow-y: auto; scrollbar-width: none; }
+        .active { display: block; animation: pageIn 0.3s ease-out; }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        body { 
-            background: var(--bg); 
-            color: #f4f4f5; 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding-top: env(safe-area-inset-top); 
-            overflow: hidden; 
-            font-size: 13px; /* Zoom idéal demandé */
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .bg-quantum { 
-            position: fixed; 
-            inset: 0; 
-            background: radial-gradient(circle at 50% -10%, #1a1a1a 0%, #030303 100%); 
-            z-index: -1; 
-        }
-
-        /* LOGO AERO V8 */
-        .aero-logo { 
-            width: 70px; 
-            height: 70px; 
-            background: #000; 
-            border: 1px solid rgba(212, 175, 55, 0.3); 
-            border-radius: 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-            margin-bottom: 30px; 
-        }
-        .aero-needle { 
-            width: 3px; 
-            height: 30px; 
-            background: var(--gold); 
-            border-radius: 3px; 
-            transform: rotate(45deg); 
-            box-shadow: 0 0 12px var(--gold); 
-        }
-
-        /* CARDS & CONTAINERS */
-        .glass-card { 
-            background: var(--card); 
-            backdrop-filter: blur(30px); 
-            border: 1px solid rgba(255,255,255,0.03); 
-            border-radius: 24px; 
-            padding: 20px; 
-            margin-bottom: 12px; 
-            position: relative;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .glass-card:active { transform: scale(0.98); }
-
-        /* NAVIGATION */
-        .nav-btn { 
-            font-size: 9px; 
-            font-weight: 900; 
-            color: #52525b; 
-            padding: 20px 0; 
-            text-transform: uppercase; 
-            flex: 1; 
-            text-align: center; 
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-        .nav-active { color: var(--gold); text-shadow: 0 0 10px rgba(212,175,55,0.3); }
-
-        /* PAGES */
-        .page { display: none; padding: 15px; padding-bottom: 140px; height: 100vh; overflow-y: auto; scrollbar-width: none; }
-        .page::-webkit-scrollbar { display: none; }
-        .active { display: block; animation: springUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes springUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* INDICATORS */
-        .perf-up { color: var(--up); text-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
-        .perf-down { color: var(--down); text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-        .is-ghost { filter: blur(15px) !important; opacity: 0.1; }
-
-        .progress-bar { background: rgba(255,255,255,0.02); height: 8px; border-radius: 99px; overflow: hidden; margin-top: 12px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #996515, var(--gold)); border-radius: 99px; transition: width 1.2s ease; }
-
-        .fire-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .fire-btn-active { background: var(--gold); color: black; border-color: var(--gold); }
+        #gold-flash { position: fixed; inset: 0; background: var(--gold); opacity: 0; pointer-events: none; z-index: 10000; transition: opacity 0.15s; }
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
+        .news-ticker { background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; padding: 12px 15px; margin-bottom: 15px; min-height: 50px; display: flex; align-items: center; position: relative; }
+        .live-tag { position: absolute; top: 5px; right: 8px; font-size: 6px; color: var(--gold); font-weight: 900; border: 1px solid var(--gold); padding: 1px 4px; border-radius: 4px; }
+        #error-popup { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 800; font-size: 10px; z-index: 10000; transition: 0.5s; text-transform: uppercase; }
+        #error-popup.show { top: 20px; }
+        .is-ghost { filter: blur(18px) !important; opacity: 0.05; }
+        .badge-active { color: var(--gold); filter: grayscale(0); opacity: 1; }
+        .badge-locked { filter: grayscale(1); opacity: 0.2; }
     </style>
 </head>
 <body onload="initApp()">
     <div class="bg-quantum"></div>
+    <div id="gold-flash"></div>
+    <canvas id="confetti-canvas"></canvas>
+    <div id="error-popup">📡 SIGNAL PERDU : ERREUR FLUX</div>
 
     <div id="lock-screen" class="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center p-10">
-        <div class="aero-logo"><div class="aero-needle"></div></div>
-        <h2 class="text-zinc-600 font-black tracking-[4px] uppercase text-[10px] mb-8">Quantum Access</h2>
-        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent text-center text-5xl w-full outline-none text-white font-black tracking-[15px] placeholder:text-zinc-900">
+        <div class="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center border border-gold/20 mb-8"><div class="w-1 h-8 bg-gold rotate-45"></div></div>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="bg-transparent text-center text-5xl w-full outline-none text-white font-black tracking-[20px]">
     </div>
 
     <div id="app-content" style="display:none">
-        <header class="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-2xl border-b border-white/5 flex justify-between items-center px-6 h-[70px]">
-            <div class="flex flex-col">
-                <span class="text-[10px] font-black tracking-[3px] text-gold uppercase">Invest Pilot</span>
-                <span class="text-[7px] text-zinc-500 font-bold uppercase">Master Engine V8.0</span>
-            </div>
+        <header class="fixed top-0 w-full z-50 bg-black/70 backdrop-blur-2xl border-b border-white/5 flex justify-between items-center px-6 h-[75px]">
+            <div class="flex flex-col"><span class="text-[10px] font-black text-gold uppercase">Invest Pilot</span><span class="text-[7px] text-zinc-500 font-black uppercase tracking-widest">OVERDRIVE V9.0</span></div>
             <div class="flex gap-3">
-                <button onclick="randomizeMarket()" class="w-10 h-10 rounded-xl bg-zinc-900/50 border border-white/10 flex items-center justify-center text-xs">📡</button>
-                <button onclick="toggleGhost()" class="w-10 h-10 rounded-xl bg-zinc-900/50 border border-white/10 flex items-center justify-center text-lg">👻</button>
+                <button onclick="fetchLiveNews()" class="w-11 h-11 rounded-2xl bg-zinc-900/50 border border-white/10 flex items-center justify-center">📡</button>
+                <button onclick="toggleGhost()" class="w-11 h-11 rounded-2xl bg-zinc-900/50 border border-white/10 flex items-center justify-center text-xl">👻</button>
             </div>
         </header>
 
-        <nav class="fixed bottom-0 w-full flex bg-black/90 backdrop-blur-3xl border-t border-white/5 z-50 pb-10 px-4">
+        <nav class="fixed bottom-0 w-full flex bg-black/95 border-t border-white/5 z-50 pb-10 px-4">
             <button onclick="showPage('main', this)" class="nav-btn nav-active">DCA</button>
             <button onclick="showPage('vault', this)" class="nav-btn">Vault</button>
             <button onclick="showPage('fire', this)" class="nav-btn">Fire</button>
             <button onclick="showPage('stats', this)" class="nav-btn">Stats</button>
         </nav>
 
-        <div id="main" class="page active mt-24">
-            <div class="glass-card mb-6">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Injection DCA Mensuelle</span>
-                    <button onclick="applyDCA()" class="bg-gold text-black text-[10px] font-black px-4 py-1.5 rounded-full uppercase active:scale-90 transition-all">✓ Valider</button>
-                </div>
-                <div class="flex items-baseline gap-1">
-                    <input type="number" id="dcaInput" value="300" oninput="calculateAll()" class="text-5xl font-black bg-transparent text-white outline-none w-full tracking-tighter">
-                    <span class="text-xl font-bold text-gold">€</span>
+        <div id="main" class="page active mt-28">
+            <div class="news-ticker"><span class="live-tag">LIVE</span><p id="news-text" class="text-[9px] font-bold text-zinc-400 uppercase leading-tight pr-10">Syncing Markets...</p></div>
+            <div class="glass-card">
+                <div class="flex justify-between items-center mb-6"><span class="text-[10px] font-black text-zinc-500 uppercase">DCA Manager</span><button onclick="applyDCA()" class="bg-gold text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase active:scale-90 transition-transform">Valider</button></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><span class="text-[8px] font-black text-gold uppercase">Injection</span><input type="number" id="dcaInput" value="300" oninput="calculateAll()" class="text-3xl font-black bg-transparent text-white outline-none w-full"></div>
+                    <div class="text-right"><span class="text-[8px] font-black text-zinc-500 uppercase">Sensorion</span><div class="text-2xl font-black text-zinc-400"><span id="sensorionTotal">0.00</span>€</div></div>
                 </div>
             </div>
-            <div id="dca-list" class="space-y-2"></div>
+            <div id="dca-list" class="space-y-2 mt-4"></div>
         </div>
 
-        <div id="vault" class="page mt-24">
-            <div class="glass-card text-center py-14">
-                <button onclick="forceCapital()" class="absolute top-6 right-6 text-zinc-700 text-xl">⚙️</button>
-                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[4px]">Net Worth Global</span>
-                <div class="text-5xl font-black text-white mt-4 blur-target tracking-tighter" id="total-val">-- €</div>
+        <div id="vault" class="page mt-28">
+            <div class="glass-card text-center py-16">
+                <button onclick="forceCapital()" class="absolute top-6 right-6 text-zinc-700 text-2xl">⚙️</button>
+                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[5px]">Net Worth Global</span>
+                <div class="text-5xl font-black text-white mt-4 blur-target" id="total-val">0 €</div>
             </div>
             <div class="glass-card">
-                <div class="flex justify-between items-end mb-2">
-                    <div>
-                        <span class="text-[9px] font-bold uppercase text-zinc-500">Objectif Liberté</span>
-                        <p class="text-xl font-black text-white blur-target">50 000 €</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-3xl font-black text-gold blur-target" id="success-pct">0%</span>
-                    </div>
-                </div>
-                <div class="progress-bar"><div id="success-bar" class="progress-fill" style="width: 0%"></div></div>
+                <div class="flex justify-between items-end mb-4"><span class="text-[9px] font-black uppercase text-zinc-500">Objectif 50k</span><div class="text-3xl font-black text-gold blur-target" id="success-pct">0%</div></div>
+                <div class="h-2.5 bg-white/5 rounded-full overflow-hidden"><div id="success-bar" class="h-full bg-gold transition-all duration-1000"></div></div>
             </div>
         </div>
 
-        <div id="fire" class="page mt-24">
-            <div class="glass-card text-center py-14 active:scale-95 transition-transform" onclick="setFireView(0)">
+        <div id="fire" class="page mt-28">
+            <div class="glass-card text-center py-14" onclick="setFireView(0)">
                 <div class="text-7xl font-black text-white blur-target tracking-tighter" id="fire-val">0 €</div>
-                <p class="text-[10px] text-zinc-500 font-bold uppercase mt-4 tracking-[3px]" id="fire-label">Rente Immédiate (4%)</p>
+                <p class="text-[10px] text-zinc-500 uppercase mt-4 tracking-[3px]" id="fire-label">Rente Immédiate (4%)</p>
             </div>
-            <div class="flex gap-2 mb-6">
-                <button id="btn-fire-5" onclick="setFireView(5)" class="fire-btn flex-1 py-4 rounded-2xl text-[10px] font-black uppercase">5 ans</button>
-                <button id="btn-fire-10" onclick="setFireView(10)" class="fire-btn flex-1 py-4 rounded-2xl text-[10px] font-black uppercase">10 ans</button>
-                <button id="btn-fire-20" onclick="setFireView(20)" class="fire-btn flex-1 py-4 rounded-2xl text-[10px] font-black uppercase">20 ans</button>
-            </div>
-            <div class="glass-card text-center py-6 bg-gold/5 border-gold/10">
-                <span class="text-xs font-black text-gold uppercase tracking-widest" id="virement-countdown">-- virements vers l'objectif</span>
+            <div class="flex gap-2">
+                <button id="btn-fire-5" onclick="setFireView(5)" class="flex-1 py-5 rounded-2xl bg-zinc-900 text-[10px] font-black uppercase">5 ans</button>
+                <button id="btn-fire-10" onclick="setFireView(10)" class="flex-1 py-5 rounded-2xl bg-zinc-900 text-[10px] font-black uppercase">10 ans</button>
+                <button id="btn-fire-20" onclick="setFireView(20)" class="flex-1 py-5 rounded-2xl bg-zinc-900 text-[10px] font-black uppercase">20 ans</button>
             </div>
         </div>
 
-        <div id="stats" class="page mt-24">
-            <div class="glass-card">
-                <span class="text-[10px] font-black text-gold uppercase mb-8 block text-center tracking-[5px]">Allocation Master</span>
-                <div class="space-y-8 max-w-xs mx-auto">
-                    <div>
-                        <div class="flex justify-between text-[10px] font-black uppercase mb-2"><span>Risque Equity</span><span>92%</span></div>
-                        <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-white w-[92%]"></div></div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-[10px] font-black uppercase mb-3">Répartition Zones Géo</div>
-                        <div class="flex h-2 rounded-full overflow-hidden">
-                            <div class="bg-gold w-[65%]"></div>
-                            <div class="bg-zinc-500 w-[25%]"></div>
-                            <div class="bg-zinc-800 w-[10%]"></div>
-                        </div>
-                        <div class="flex justify-between text-[8px] font-black mt-2 opacity-40 uppercase">
-                            <span>US 65%</span><span>EU 25%</span><span>EM 10%</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-[10px] font-black uppercase mb-2"><span>PEA / Crypto</span><span>89% / 11%</span></div>
-                        <div class="flex h-2 rounded-full overflow-hidden">
-                            <div class="bg-white w-[89%]"></div>
-                            <div class="bg-zinc-700 w-[11%]"></div>
-                        </div>
-                    </div>
-                </div>
+        <div id="stats" class="page mt-28">
+            <div class="glass-card mb-4">
+                <span class="text-[10px] font-black text-gold uppercase tracking-[4px] mb-6 block">Succès</span>
+                <div id="milestone-list" class="space-y-4"></div>
+            </div>
+            <div class="glass-card mb-4">
+                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-[4px] mb-6 block">Historique DCA</span>
+                <div id="dca-log" class="space-y-2 text-[9px] font-black uppercase"></div>
             </div>
         </div>
     </div>
 
     <script>
         const PIN = "1104";
-        let isGhost = false;
-        let capitalBase = 12472.38;
-        let selectedYear = 0;
-
-        // Stratégie complète
+        let isGhost = false, capitalBase = 325.12, selectedYear = 0, dcaHistory = [];
+        let sensorion = { parts: 69, currentPrice: 0.68 };
         const STRATEGY = [
-            { id: 'WPEA', name: 'MSCI World Acc', base: 175, priority: true, perf: 0.85 },
-            { id: 'COFA', name: 'Coface SA', base: 45, priority: false, perf: -0.10 },
-            { id: 'PMEH', name: 'Immobilier Europe', base: 25, priority: false, perf: 0.05 },
-            { id: 'PAEEM', name: 'Emerging Markets', base: 20, priority: false, perf: -1.45 },
-            { id: 'BTC', name: 'Bitcoin (Crypto)', base: 35, priority: true, perf: 3.50 }
+            { id: 'WPEA', name: 'MSCI World', base: 175, priority: true },
+            { id: 'BTC', name: 'Bitcoin', base: 35, priority: true },
+            { id: 'COFA', name: 'Coface SA', base: 45, priority: false },
+            { id: 'PMEH', name: 'Immo Europe', base: 25, priority: false },
+            { id: 'PAEEM', name: 'Emerging Mkt', base: 20, priority: false }
+        ];
+        const MILESTONES = [
+            { label: "Explorer", val: 100, icon: "🛡️" },
+            { label: "Bronze", val: 1000, icon: "🥉" },
+            { label: "Silver", val: 10000, icon: "🥈" },
+            { label: "Gold", val: 25000, icon: "🥇" },
+            { label: "Platinum", val: 50000, icon: "👑" }
         ];
 
-        function initApp() {
-            document.getElementById('pinInput').addEventListener('input', (e) => {
-                if(e.target.value === PIN) {
-                    document.getElementById('lock-screen').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('lock-screen').style.display = 'none';
-                        document.getElementById('app-content').style.display = 'block';
-                        calculateAll();
-                    }, 400);
-                }
+        // Canvas & Flash Logic
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function triggerGoldRush() {
+            document.getElementById('gold-flash').style.opacity = "0.7";
+            setTimeout(() => document.getElementById('gold-flash').style.opacity = "0", 250);
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            for(let i=0; i<80; i++) particles.push({ x: canvas.width/2, y: canvas.height/2, size: Math.random()*4+1, color: `hsl(${45+Math.random()*10}, 70%, 50%)`, vx: Math.random()*10-5, vy: Math.random()*10-5, life: 1 });
+            animate();
+        }
+        function animate() {
+            if(particles.length === 0) return;
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles.forEach((p,i) => {
+                p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life -= 0.01;
+                ctx.fillStyle = p.color; ctx.globalAlpha = p.life;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+                if(p.life <= 0) particles.splice(i,1);
             });
+            requestAnimationFrame(animate);
         }
 
-        // SIMULATION LIVE DES MARCHES
-        function randomizeMarket() {
-            STRATEGY.forEach(a => {
-                const change = (Math.random() * 4 - 2).toFixed(2);
-                a.perf = (parseFloat(a.perf) + parseFloat(change)).toFixed(2);
-            });
-            calculateAll();
+        async function fetchLiveNews() {
+            const newsEl = document.getElementById('news-text');
+            newsEl.innerText = "Synchronisation...";
+            try {
+                const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://finance.yahoo.com/news/rssindex');
+                const data = await res.json();
+                if(data.items) newsEl.innerText = data.items[Math.floor(Math.random()*data.items.length)].title.toUpperCase();
+            } catch (e) {
+                document.getElementById('error-popup').classList.add('show');
+                setTimeout(() => document.getElementById('error-popup').classList.remove('show'), 5000);
+            }
         }
 
         function calculateAll() {
             const input = parseFloat(document.getElementById('dcaInput').value) || 0;
             const surplus = Math.max(0, input - 300);
+            const sensVal = sensorion.parts * sensorion.currentPrice;
+            document.getElementById('sensorionTotal').innerText = sensVal.toFixed(2);
             
-            // RENDU DCA AVEC SWAP PERF
-            document.getElementById('dca-list').innerHTML = STRATEGY.map(asset => {
-                let amount = asset.base;
-                if (surplus > 0 && asset.priority) {
-                    amount += (asset.id === 'WPEA') ? surplus * 0.7 : surplus * 0.3;
-                }
-                
-                const isPos = asset.perf >= 0;
-                const trendClass = isPos ? 'perf-up' : 'perf-down';
-                const arrow = isPos ? '↗' : '↘';
-
-                return `<div class="glass-card !py-5 flex justify-between items-center">
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-xs font-black text-gold uppercase tracking-wider">${asset.id}</span>
-                            <span class="text-[10px] font-black ${trendClass}">${arrow} ${isPos?'+':''}${asset.perf}%</span>
-                        </div>
-                        <p class="text-[8px] text-zinc-500 font-bold uppercase">${asset.name}</p>
-                    </div>
-                    <div class="text-2xl font-black blur-target ${isGhost?'is-ghost':''}">${amount.toFixed(2)} <span class="text-xs text-zinc-700">€</span></div>
-                </div>`;
-            }).join('');
-
-            updateVault();
-            updateFire();
-        }
-
-        function updateVault() {
-            const goal = 50000;
-            const pct = Math.min((capitalBase / goal) * 100, 100);
+            document.getElementById('dca-list').innerHTML = STRATEGY.map(a => {
+                let amt = a.base;
+                if(surplus > 0 && a.priority) amt += (a.id === 'WPEA') ? surplus * 0.7 : surplus * 0.3;
+                return `<div class="glass-card !py-5 flex justify-between items-center"><div><span class="font-black text-gold">${a.id}</span><p class="text-[8px] text-zinc-500 uppercase">${a.name}</p></div><div class="text-2xl font-black blur-target ${isGhost?'is-ghost':''}">${amt.toFixed(2)}€</div></div>`;
+            }).join('') + `<div class="glass-card !py-5 border-l-2 border-gold/30 bg-gold/5 flex justify-between items-center"><div><span class="font-black text-white tracking-widest">SENS</span><p class="text-[8px] text-zinc-500 uppercase">Current Parts</p></div><div class="text-2xl font-black blur-target ${isGhost?'is-ghost':''}">${sensVal.toFixed(2)}€</div></div>`;
+            
             document.getElementById('total-val').innerText = capitalBase.toLocaleString('fr-FR') + " €";
+            const pct = Math.min((capitalBase/50000)*100, 100);
             document.getElementById('success-pct').innerText = Math.round(pct) + "%";
             document.getElementById('success-bar').style.width = pct + "%";
-        }
-
-        function updateFire() {
-            const input = parseFloat(document.getElementById('dcaInput').value) || 0;
-            const yieldRate = 0.07; // 7% annuel estimé pour projection
             
-            if (selectedYear > 0) {
-                // Formule intérêts composés avec versements mensuels
-                const months = selectedYear * 12;
-                const monthlyRate = yieldRate / 12;
-                const futureValue = capitalBase * Math.pow(1 + monthlyRate, months) + 
-                                   input * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
-                
-                document.getElementById('fire-val').innerText = Math.round(futureValue * 0.04 / 12) + " €";
-                document.getElementById('fire-label').innerText = `Projection ${selectedYear} ans (7%)`;
-            } else {
-                document.getElementById('fire-val').innerText = Math.round(capitalBase * 0.04 / 12) + " €";
-                document.getElementById('fire-label').innerText = "Rente Immédiate (4%)";
-            }
-
-            const remaining = 50000 - capitalBase;
-            const monthsLeft = Math.ceil(remaining / (input || 1));
-            document.getElementById('virement-countdown').innerText = (monthsLeft > 0 ? monthsLeft : 0) + " virements vers 50k";
+            const fv = (selectedYear > 0) ? (capitalBase * Math.pow(1.0058, selectedYear*12) + input * ((Math.pow(1.0058, selectedYear*12)-1)/0.0058)) : capitalBase;
+            document.getElementById('fire-val').innerText = Math.round(fv * 0.04 / 12) + " €";
+            updateUI();
         }
 
-        // ACTIONS UTILISATEUR
-        function setFireView(y) {
-            selectedYear = y;
-            document.querySelectorAll('.fire-btn').forEach(b => b.classList.remove('fire-btn-active'));
-            if(y > 0) document.getElementById('btn-fire-'+y).classList.add('fire-btn-active');
-            updateFire();
+        function updateUI() {
+            document.getElementById('milestone-list').innerHTML = MILESTONES.map(m => `<div class="flex items-center justify-between ${capitalBase >= m.val ? 'badge-active' : 'badge-locked'}"><div class="flex items-center gap-3"><span class="text-xl">${m.icon}</span><div><p class="text-[10px] font-black uppercase">${m.label}</p><p class="text-[7px] text-zinc-500 uppercase">${m.val} €</p></div></div><span class="text-[8px] font-black">${capitalBase >= m.val ? '✅' : '🔒'}</span></div>`).join('');
+            document.getElementById('dca-log').innerHTML = dcaHistory.map(h => `<div class="flex justify-between border-b border-white/5 py-2"><span>${h.date}</span><span class="text-gold">+${h.amt}€</span></div>`).reverse().join('');
         }
 
-        function applyDCA() {
-            const val = parseFloat(document.getElementById('dcaInput').value) || 0;
-            capitalBase += val;
-            calculateAll();
-            alert("Stratégie déployée : " + val + "€ injectés.");
+        function applyDCA() { 
+            const amt = parseFloat(document.getElementById('dcaInput').value);
+            const old = capitalBase;
+            capitalBase += amt;
+            dcaHistory.push({ date: new Date().toLocaleDateString('fr-FR'), amt: amt });
+            if(MILESTONES.some(m => old < m.val && capitalBase >= m.val)) triggerGoldRush();
+            calculateAll(); alert("INJECTION RÉUSSIE"); 
         }
 
-        function forceCapital() {
-            const val = prompt("Ajuster le Net Worth manuel :", capitalBase);
-            if(val !== null) {
-                capitalBase = parseFloat(val);
-                calculateAll();
-            }
-        }
-
-        function toggleGhost() {
-            isGhost = !isGhost;
-            document.querySelectorAll('.blur-target').forEach(e => e.classList.toggle('is-ghost', isGhost));
+        function initApp() {
+            document.getElementById('pinInput').addEventListener('input', (e) => {
+                if(e.target.value === PIN) {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('app-content').style.display = 'block';
+                    calculateAll(); fetchLiveNews();
+                }
+            });
         }
 
         function showPage(id, btn) {
@@ -342,8 +209,16 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
-            calculateAll();
         }
+
+        function forceCapital() { let v = prompt("Rectifier Capital :", capitalBase); if(v) { capitalBase = parseFloat(v); calculateAll(); } }
+        function setFireView(y) { 
+            selectedYear = y; 
+            document.querySelectorAll('[id^="btn-fire-"]').forEach(b => b.classList.remove('bg-gold', 'text-black'));
+            if(y > 0) document.getElementById('btn-fire-'+y).classList.add('bg-gold', 'text-black');
+            calculateAll(); 
+        }
+        function toggleGhost() { isGhost = !isGhost; calculateAll(); }
     </script>
 </body>
 </html>
